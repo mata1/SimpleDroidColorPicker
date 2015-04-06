@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+
+    <com.github.mata1.simpledroidcolorpicker.ColorPicker
+        android:id="@+id/cp"
+        android:padding="10dp"
+        android:visibility="visible"
+        android:background="#ddff88"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <com.github.mata1.simpledroidcolorpicker.ColorRing
+        android:visibility="gone"
+        custom:thickness="60dp"
+        android:background="#aaffdd"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <SeekBar
+        android:id="@+id/sb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
