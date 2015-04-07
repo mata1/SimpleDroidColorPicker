@@ -11,6 +11,7 @@ import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 
 import com.github.mata1.simpledroidcolorpicker.R;
 import com.github.mata1.simpledroidcolorpicker.utils.Utils;
@@ -86,8 +87,6 @@ public class RingColorPicker extends ColorPicker {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
-        //super.onSizeChanged(w, h, oldW, oldH);
-
         mHalfWidth = w / 2f;
         mHalfHeight = h / 2f;
         mOuterRadius = Math.min(mHalfWidth, mHalfHeight) - mOuterStrokePaint.getStrokeWidth()/2 - getMaxPadding();
@@ -131,49 +130,54 @@ public class RingColorPicker extends ColorPicker {
         float x = event.getRawX() - location[0];
         float y = event.getRawY() - location[1];
 
+        float angle = Utils.getAngleDeg(mHalfWidth, mHalfHeight, x, y);
+        float dist = Utils.getDistance(mHalfWidth, mHalfHeight, x, y);
+        boolean isTouchingRing = dist > mInnerRadius + mGapWidth && dist < mOuterRadius + mOuterStrokePaint.getStrokeWidth();
+        boolean isTouchingCenter = dist < mInnerRadius;
+
         switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                // check if touching handle
+                float absDiff = Math.abs(angle - mAngle);
+                if (absDiff < HANDLE_TOUCH_LIMIT && isTouchingRing)
+                    mDragging = true;
+                break;
+
             case MotionEvent.ACTION_MOVE:
-                // TODO check if touching ring
-                if (mDragging) {
-                    mAngle = Utils.getAngleDeg(mHalfWidth, mHalfHeight, x, y);
+                // check if dragging AND touching ring
+                if (mDragging && isTouchingRing) {
+                    mAngle = angle;
                     invalidate();
                 }
-
                 break;
 
             case MotionEvent.ACTION_UP:
-                // release handle
-                mDragging = false;
-
-                // TODO check if touching center
-                if (mListener != null)
+                if (mDragging) {
+                    // release handle if dragging
+                    mDragging = false;
+                } else if (mListener != null && isTouchingCenter) {
+                    // fire event if touching center
                     mListener.colorPicked(Utils.getColorFromAngle(mAngle));
+                    playSoundEffect(SoundEffectConstants.CLICK);
+                } else if (isTouchingRing) {
+                    // move handle if touching ring
+                    float diff = mAngle - angle;
 
-                // TODO check if touching ring
-                float newAngle = Utils.getAngleDeg(mHalfWidth, mHalfHeight, x, y);
-                float diff = mAngle - newAngle;
+                    // correct angles
+                    if (diff < -180) diff += 360;
+                    else if (diff > 180) diff -= 360;
 
-                // correct angles
-                if (diff < -180) diff += 360;
-                else if (diff > 180) diff -= 360;
-
-                // start animating
-                ValueAnimator anim = ValueAnimator.ofFloat(mAngle, mAngle - diff);
-                anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        mAngle = (float)animation.getAnimatedValue();
-                        invalidate();
-                    }
-                });
-                anim.start();
-                break;
-
-            case MotionEvent.ACTION_DOWN:
-                // TODO check if touching ring
-                float absDiff = Math.abs(Utils.getAngleDeg(mHalfWidth, mHalfHeight, x, y) - mAngle);
-                if (absDiff < HANDLE_TOUCH_LIMIT)
-                    mDragging = true;
+                    // start animating
+                    ValueAnimator anim = ValueAnimator.ofFloat(mAngle, mAngle - diff);
+                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            mAngle = (float) animation.getAnimatedValue();
+                            invalidate();
+                        }
+                    });
+                    anim.start();
+                }
                 break;
         }
 

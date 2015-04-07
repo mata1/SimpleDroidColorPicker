@@ -56,4 +56,16 @@ public class Utils {
     public static float getAngleDeg(float x1, float y1, float x2, float y2) {
         return (float)Math.toDegrees(getAngle(x1, y1, x2, y2));
     }
+
+    /**
+     * Get distance between two points
+     * @param x1 first x coordinate
+     * @param y1 first y coordinate
+     * @param x2 second x coordinate
+     * @param y2 second y coordinate
+     * @return distance between two points
+     */
+    public static float getDistance(float x1, float y1, float x2, float y2) {
+        return (float)Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    }
 }
