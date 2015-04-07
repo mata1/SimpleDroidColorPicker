@@ -1,12 +1,19 @@
 package com.github.mata1.simpledroidcolorpickertest;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
+import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 
 public class MainActivity extends Activity {
@@ -50,5 +57,16 @@ public class MainActivity extends Activity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
+    }
+
+    public void save(View v) {
+        cr.setDrawingCacheEnabled(true);
+        Bitmap b = cr.getDrawingCache();
+        String sd = Environment.getExternalStorageDirectory() + File.separator + "RingColorPicker.png";
+        try {
+            b.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(sd));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

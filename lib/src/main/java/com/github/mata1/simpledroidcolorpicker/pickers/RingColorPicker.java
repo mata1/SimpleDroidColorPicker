@@ -167,6 +167,9 @@ public class RingColorPicker extends ColorPicker {
                     if (diff < -180) diff += 360;
                     else if (diff > 180) diff -= 360;
 
+                    if (mAngle > 360) mAngle -= 360;
+                    else if (mAngle < 0) mAngle += 360;
+
                     // start animating
                     ValueAnimator anim = ValueAnimator.ofFloat(mAngle, mAngle - diff);
                     anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
