@@ -13,29 +13,72 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.github.mata1.simpledroidcolorpicker.util.Utils;
+import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
+import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 
 /**
- * RGB Color Ring View. Starting with red color at 0 degrees.
+ * Color Ring Picker View
  */
 public class ColorRingPicker extends View {
 
     private OnColorPickedListener mListener;
 
-    private Paint mRingPaint, mStrokePaint, mInnerPaint, mInnerStrokePaint, mHandlePaint;
+    private Paint mOuterPaint, mOuterStrokePaint;
+    private Paint mInnerPaint, mInnerStrokePaint;
+    private Paint mHandlePaint;
+
     private RectF mHandleRect;
 
-    private int mRingWidth, mStrokeWidth, mGapWidth;
+    private int mRingWidth, mStrokeWidth, mGapWidth; // view attributes
+    private float mInnerRadius, mOuterRadius, mHalfWidth, mHalfHeight; // view measurements
 
     private float mAngle; // current selection angle
     private boolean mDragging; // whether handle is being dragged
 
     private static final int HANDLE_TOUCH_LIMIT = 15;
+    private static final int HANDLE_WIDTH = 40;
 
     public ColorRingPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initAttributes(attrs);
+        init();
+    }
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ColorPicker);
+    public ColorRingPicker(Context context, AttributeSet attrs, int defStyle) {
+        this(context, attrs);
+    }
+
+    /**
+     * Initialize member objects
+     */
+    private void init() {
+        // init paints
+        mOuterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mOuterPaint.setStyle(Paint.Style.STROKE);
+        mOuterPaint.setColor(Color.WHITE);
+        mOuterPaint.setStrokeWidth(mRingWidth);
+        mOuterStrokePaint = new Paint(mOuterPaint);
+        mOuterStrokePaint.setStrokeWidth(mRingWidth + mStrokeWidth * 2);
+
+        mInnerPaint = new Paint(mOuterPaint);
+        mInnerPaint.setStyle(Paint.Style.FILL);
+        mInnerPaint.setColor(Color.RED);
+        mInnerStrokePaint = new Paint(mOuterPaint);
+        mInnerStrokePaint.setStrokeWidth(mStrokeWidth * 2);
+
+        mHandlePaint = new Paint(mOuterPaint);
+        mHandlePaint.setStrokeWidth(mStrokeWidth);
+
+        // init rectangle
+        mHandleRect = new RectF();
+    }
+
+    /**
+     * Initialize XML attributes
+     * @param attrs xml attribute set
+     */
+    private void initAttributes(AttributeSet attrs) {
+        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ColorPicker);
 
         try {
             mRingWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_ringWidth, 50);
@@ -44,76 +87,43 @@ public class ColorRingPicker extends View {
         } finally {
             a.recycle();
         }
-
-        mRingPaint = new Paint();
-        mRingPaint.setStyle(Paint.Style.STROKE);
-        mRingPaint.setAntiAlias(true);
-        mRingPaint.setStrokeWidth(mRingWidth);
-
-        mStrokePaint = new Paint(mRingPaint);
-        mStrokePaint.setColor(Color.WHITE);
-        mStrokePaint.setStrokeWidth(mRingWidth + mStrokeWidth * 2);
-
-        mInnerPaint = new Paint(mRingPaint);
-        mInnerPaint.setStyle(Paint.Style.FILL);
-        mInnerPaint.setColor(Color.RED);
-
-        mInnerStrokePaint = new Paint(mRingPaint);
-        mInnerStrokePaint.setStrokeWidth(mStrokeWidth * 2);
-        mInnerStrokePaint.setStyle(Paint.Style.STROKE);
-        mInnerStrokePaint.setColor(Color.WHITE);
-
-        mHandlePaint = new Paint(mInnerStrokePaint);
-        mHandlePaint.setStrokeWidth(mStrokeWidth);
-
-        mHandleRect = new RectF();
-    }
-
-    public ColorRingPicker(Context context, AttributeSet attrs, int defStyle) {
-        this(context, attrs);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        Shader gradientShader = new SweepGradient(w/2f, h/2f, getAllColors(), getAllPositions());
-        mRingPaint.setShader(gradientShader);
-    }
+        mHalfWidth = w / 2f;
+        mHalfHeight = h / 2f;
+        mOuterRadius = Math.min(mHalfWidth, mHalfHeight) - mOuterStrokePaint.getStrokeWidth()/2 - getMaxPadding();
+        mInnerRadius = mOuterRadius - mOuterStrokePaint.getStrokeWidth()/2 - mGapWidth;
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int min = Math.min(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
-        int spec = MeasureSpec.makeMeasureSpec(min, MeasureSpec.EXACTLY);
-        setMeasuredDimension(spec, spec);
+        mHandleRect.set(
+                getPaddingLeft(), // left
+                mHalfHeight - HANDLE_WIDTH/2, // top
+                getPaddingLeft() + mOuterStrokePaint.getStrokeWidth(), // right
+                mHalfHeight + HANDLE_WIDTH/2 // bottom
+        );
+
+        // create color ring shader
+        Shader gradientShader = new SweepGradient(mHalfWidth, mHalfHeight, Utils.getHueRingColors(36), null);
+        mOuterPaint.setShader(gradientShader);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        float center = Math.min(getWidth(), getHeight())/2f;
-        float rOuter = center - mStrokePaint.getStrokeWidth()/2 - getPaddingTop();
-        float rInner = rOuter - mStrokePaint.getStrokeWidth()/2 - mGapWidth;
-        float w = getWidth()/2f, h = getHeight()/2f;
-
-        mHandleRect.set(
-                getPaddingLeft(), // left
-                h - 20, // top
-                getPaddingLeft() + mStrokePaint.getStrokeWidth(), // right
-                h + 20 // bottom
-        );
-
         // outer ring
-        canvas.drawCircle(w, h, rOuter, mStrokePaint);
-        canvas.drawCircle(w, h, rOuter, mRingPaint);
+        canvas.drawCircle(mHalfWidth, mHalfHeight, mOuterRadius, mOuterStrokePaint);
+        canvas.drawCircle(mHalfWidth, mHalfHeight, mOuterRadius, mOuterPaint);
 
         // inner circle
         mInnerPaint.setColor(Utils.getColorFromAngle(mAngle));
-        canvas.drawCircle(w, h, rInner, mInnerStrokePaint);
-        canvas.drawCircle(w, h, rInner, mInnerPaint);
+        canvas.drawCircle(mHalfWidth, mHalfHeight, mInnerRadius, mInnerStrokePaint);
+        canvas.drawCircle(mHalfWidth, mHalfHeight, mInnerRadius, mInnerPaint);
 
         // rotate handle
         canvas.save();
-        canvas.rotate(mAngle, w, h);
+        canvas.rotate(mAngle, mHalfWidth, mHalfHeight);
         canvas.drawRoundRect(mHandleRect, 5, 5, mHandlePaint);
         canvas.restore();
     }
@@ -130,11 +140,12 @@ public class ColorRingPicker extends View {
             case MotionEvent.ACTION_MOVE:
                 // TODO check if touching ring
                 if (mDragging) {
-                    mAngle = getAngleDeg(x, y);
+                    mAngle = Utils.getAngleDeg(mHalfWidth, mHalfHeight, x, y);
                     invalidate();
                 }
 
                 break;
+
             case MotionEvent.ACTION_UP:
                 // release handle
                 mDragging = false;
@@ -144,7 +155,7 @@ public class ColorRingPicker extends View {
                     mListener.colorPicked(Utils.getColorFromAngle(mAngle));
 
                 // TODO check if touching ring
-                float newAngle = getAngleDeg(x, y);
+                float newAngle = Utils.getAngleDeg(mHalfWidth, mHalfHeight, x, y);
                 float diff = mAngle - newAngle;
 
                 // correct angles
@@ -162,9 +173,10 @@ public class ColorRingPicker extends View {
                 });
                 anim.start();
                 break;
+
             case MotionEvent.ACTION_DOWN:
                 // TODO check if touching ring
-                float absDiff = Math.abs(getAngleDeg(x, y) - mAngle);
+                float absDiff = Math.abs(Utils.getAngleDeg(mHalfWidth, mHalfHeight, x, y) - mAngle);
                 if (absDiff < HANDLE_TOUCH_LIMIT)
                     mDragging = true;
                 break;
@@ -173,54 +185,51 @@ public class ColorRingPicker extends View {
         return true;
     }
 
-    private double getAngle(float x, float y) {
-        return Math.atan2(getWidth()/2f - x, getHeight()/2f - y) * -1 + Math.PI/2;
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int min = Math.min(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
+        int spec = MeasureSpec.makeMeasureSpec(min, MeasureSpec.EXACTLY);
+        setMeasuredDimension(spec, spec);
     }
 
-    private float getAngleDeg(float x, float y) {
-        return (float)Math.toDegrees(getAngle(x, y));
-    }
-
+    /**
+     * Set outer color ring width
+     * @param ringWidth outer ring width in pixels
+     */
     public void setRingWidth(int ringWidth) {
         mRingWidth = ringWidth;
-        mRingPaint.setStrokeWidth(mRingWidth);
-        mStrokePaint.setStrokeWidth(mRingWidth + mStrokeWidth * 2);
+        mOuterPaint.setStrokeWidth(mRingWidth);
+        mOuterStrokePaint.setStrokeWidth(mRingWidth + mStrokeWidth * 2);
+
+        onSizeChanged(getWidth(), getHeight(), 0, 0);
         invalidate();
     }
 
+    /**
+     * Set gap width between outer ring and inner circle
+     * @param gapWidth gap width in pixels
+     */
     public void setGapWidth(int gapWidth) {
         mGapWidth = gapWidth;
+
+        onSizeChanged(getWidth(), getHeight(), 0, 0);
         invalidate();
     }
 
-    private float[] getAllPositions() {
-        float[] p = new float[360];
-
-        for (int i = 0; i < p.length; i++) {
-            p[i] = (float)(i+1)/p.length;
-        }
-
-        return p;
-    }
-
-    private int[] getAllColors() {
-        int[] c = new int[360];
-
-        for (int i = 0; i < 360; i++)
-            c[i] = Color.HSVToColor(new float[]{i, 1, 1});
-
-        return c;
-    }
-
-    /*
-    INTERFACE
+    /**
+     * Get view maximum padding
+     * @return maximum padding
      */
-
-    public interface OnColorPickedListener{
-        public void colorPicked(int color);
+    private int getMaxPadding() {
+        return Math.max(Math.max(getPaddingLeft(), getPaddingRight()), Math.max(getPaddingTop(), getPaddingBottom()));
     }
 
-    public void setColorPickedListener(OnColorPickedListener eventListener) {
+    /**
+     * Set listener for color picked event
+     * @see com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener
+     * @param eventListener OnColorPickedListener event listener
+     */
+    public void setOnColorPickedListener(OnColorPickedListener eventListener) {
         mListener = eventListener;
     }
 }

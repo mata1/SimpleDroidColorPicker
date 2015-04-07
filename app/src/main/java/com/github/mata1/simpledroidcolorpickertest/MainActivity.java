@@ -6,6 +6,7 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.github.mata1.simpledroidcolorpicker.ColorRingPicker;
+import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
 
 
 public class MainActivity extends Activity {
@@ -19,7 +20,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         cr = (ColorRingPicker)findViewById(R.id.cr);
-        cr.setColorPickedListener(new ColorRingPicker.OnColorPickedListener() {
+        cr.setOnColorPickedListener(new OnColorPickedListener() {
             @Override
             public void colorPicked(int color) {
                 Toast.makeText(getApplicationContext(), "Color selected: " + color, Toast.LENGTH_SHORT).show();
