@@ -3,28 +3,34 @@
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
+    android:padding="@dimen/defaultPadding"
     tools:context=".MainActivity"
     android:orientation="vertical">
 
-    <com.github.mata1.simpledroidcolorpicker.ColorPicker
-        android:id="@+id/cp"
-        android:padding="10dp"
+    <com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker
+        android:id="@+id/cr"
         android:visibility="visible"
-        android:background="#ddff88"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <com.github.mata1.simpledroidcolorpicker.ColorRing
-        android:visibility="gone"
-        custom:thickness="60dp"
-        android:background="#aaffdd"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <SeekBar
-        android:id="@+id/sb"
+        android:padding="10dp"
+        android:background="#00aaffdd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <SeekBar
+        android:id="@+id/sb_ring"
+        android:progress="50"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <SeekBar
+        android:id="@+id/sb_gap"
+        android:progress="50"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!--<Button
+        android:onClick="save"
+        android:text="Save image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />-->
 
 </LinearLayout>

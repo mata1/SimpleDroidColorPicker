@@ -1,42 +1,72 @@
 package com.github.mata1.simpledroidcolorpickertest;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.os.Environment;
+import android.view.View;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
-import com.github.mata1.simpledroidcolorpicker.ColorPicker;
+import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
+import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 
 public class MainActivity extends Activity {
 
-    SeekBar sb;
-    ColorPicker cp;
+    SeekBar sbRing, sbGap;
+    RingColorPicker cr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        cp = (ColorPicker)findViewById(R.id.cp);
-
-        sb = (SeekBar)findViewById(R.id.sb);
-        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        cr = (RingColorPicker)findViewById(R.id.cr);
+        cr.setOnColorPickedListener(new OnColorPickedListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                cp.setThickness(progress);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
+            public void colorPicked(int color) {
+                Toast.makeText(getApplicationContext(), "Color selected: " + color, Toast.LENGTH_SHORT).show();
             }
         });
+
+        sbRing = (SeekBar)findViewById(R.id.sb_ring);
+        sbRing.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                cr.setRingWidth(progress);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
+        sbGap = (SeekBar)findViewById(R.id.sb_gap);
+        sbGap.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                cr.setGapWidth(progress);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+    }
+
+    public void save(View v) {
+        cr.setDrawingCacheEnabled(true);
+        Bitmap b = cr.getDrawingCache();
+        String sd = Environment.getExternalStorageDirectory() + File.separator + "RingColorPicker.png";
+        try {
+            b.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(sd));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
