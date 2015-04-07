@@ -1,0 +1,3 @@
+<resources>
+    <dimen name="defaultPadding">10dp</dimen>
+</resources>
