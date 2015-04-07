@@ -20,6 +20,15 @@ public class Utils {
     }
 
     /**
+     * Get color from float between 0 and 1
+     * @param fraction float between 0 and 1
+     * @return color from fraction
+     */
+    public static int getColorFromFraction(float fraction) {
+        return Color.HSVToColor(new float[] { fraction*360, 1, 1 });
+    }
+
+    /**
      * Get hue ring color array
      * @param n number of colors in array
      * @return hue color array

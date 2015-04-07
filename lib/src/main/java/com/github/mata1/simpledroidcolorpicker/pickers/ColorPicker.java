@@ -3,6 +3,7 @@ package com.github.mata1.simpledroidcolorpicker.pickers;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
@@ -31,6 +32,9 @@ public abstract class ColorPicker extends View {
 
     @Override
     protected abstract void onSizeChanged(int w, int h, int oldW, int oldH);
+
+    @Override
+    public abstract boolean onTouchEvent(MotionEvent event);
 
     /**
      * Set listener for color picked event
