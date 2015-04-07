@@ -7,7 +7,7 @@
     tools:context=".MainActivity"
     android:orientation="vertical">
 
-    <com.github.mata1.simpledroidcolorpicker.ColorRingPicker
+    <com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker
         android:id="@+id/cr"
         android:visibility="visible"
         android:padding="10dp"

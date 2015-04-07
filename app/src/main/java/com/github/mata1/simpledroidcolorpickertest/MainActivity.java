@@ -5,21 +5,21 @@ import android.os.Bundle;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import com.github.mata1.simpledroidcolorpicker.ColorRingPicker;
+import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
 
 
 public class MainActivity extends Activity {
 
     SeekBar sbRing, sbGap;
-    ColorRingPicker cr;
+    RingColorPicker cr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        cr = (ColorRingPicker)findViewById(R.id.cr);
+        cr = (RingColorPicker)findViewById(R.id.cr);
         cr.setOnColorPickedListener(new OnColorPickedListener() {
             @Override
             public void colorPicked(int color) {

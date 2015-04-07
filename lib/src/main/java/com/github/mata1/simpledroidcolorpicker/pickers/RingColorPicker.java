@@ -1,4 +1,4 @@
-package com.github.mata1.simpledroidcolorpicker;
+package com.github.mata1.simpledroidcolorpicker.pickers;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -11,17 +11,14 @@ import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
 
-import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
+import com.github.mata1.simpledroidcolorpicker.R;
 import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 
 /**
  * Color Ring Picker View
  */
-public class ColorRingPicker extends View {
-
-    private OnColorPickedListener mListener;
+public class RingColorPicker extends ColorPicker {
 
     private Paint mOuterPaint, mOuterStrokePaint;
     private Paint mInnerPaint, mInnerStrokePaint;
@@ -38,20 +35,18 @@ public class ColorRingPicker extends View {
     private static final int HANDLE_TOUCH_LIMIT = 15;
     private static final int HANDLE_WIDTH = 40;
 
-    public ColorRingPicker(Context context, AttributeSet attrs) {
+    public RingColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initAttributes(attrs);
-        init();
     }
 
-    public ColorRingPicker(Context context, AttributeSet attrs, int defStyle) {
-        this(context, attrs);
+    public RingColorPicker(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
     }
 
     /**
      * Initialize member objects
      */
-    private void init() {
+    protected void init() {
         // init paints
         mOuterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mOuterPaint.setStyle(Paint.Style.STROKE);
@@ -77,7 +72,7 @@ public class ColorRingPicker extends View {
      * Initialize XML attributes
      * @param attrs xml attribute set
      */
-    private void initAttributes(AttributeSet attrs) {
+    protected void initAttributes(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ColorPicker);
 
         try {
@@ -90,8 +85,8 @@ public class ColorRingPicker extends View {
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
+    protected void onSizeChanged(int w, int h, int oldW, int oldH) {
+        //super.onSizeChanged(w, h, oldW, oldH);
 
         mHalfWidth = w / 2f;
         mHalfHeight = h / 2f;
@@ -222,14 +217,5 @@ public class ColorRingPicker extends View {
      */
     private int getMaxPadding() {
         return Math.max(Math.max(getPaddingLeft(), getPaddingRight()), Math.max(getPaddingTop(), getPaddingBottom()));
-    }
-
-    /**
-     * Set listener for color picked event
-     * @see com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener
-     * @param eventListener OnColorPickedListener event listener
-     */
-    public void setOnColorPickedListener(OnColorPickedListener eventListener) {
-        mListener = eventListener;
     }
 }
