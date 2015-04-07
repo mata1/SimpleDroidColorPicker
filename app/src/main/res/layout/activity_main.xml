@@ -7,20 +7,14 @@
     tools:context=".MainActivity"
     android:orientation="vertical">
 
-    <com.github.mata1.simpledroidcolorpicker.ColorPicker
-        android:id="@+id/cp"
-        android:padding="10dp"
+    <com.github.mata1.simpledroidcolorpicker.ColorRingPicker
+        android:id="@+id/cr"
         android:visibility="visible"
-        android:background="#ddff88"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <com.github.mata1.simpledroidcolorpicker.ColorRing
-        android:visibility="gone"
+        android:padding="10dp"
         custom:thickness="60dp"
         android:background="#aaffdd"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
 
     <SeekBar
         android:id="@+id/sb"

@@ -2,30 +2,28 @@ package com.github.mata1.simpledroidcolorpickertest;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.SeekBar;
 
-import com.github.mata1.simpledroidcolorpicker.ColorPicker;
+import com.github.mata1.simpledroidcolorpicker.ColorRingPicker;
 
 
 public class MainActivity extends Activity {
 
     SeekBar sb;
-    ColorPicker cp;
+    ColorRingPicker cr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        cp = (ColorPicker)findViewById(R.id.cp);
+        cr = (ColorRingPicker)findViewById(R.id.cr);
 
         sb = (SeekBar)findViewById(R.id.sb);
         sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                cp.setThickness(progress);
+                cr.setThickness(progress);
             }
 
             @Override
