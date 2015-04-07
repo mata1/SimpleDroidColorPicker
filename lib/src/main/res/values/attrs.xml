@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="ColorPicker">
-        <attr name="thickness" format="dimension"/>
+        <attr name="ringWidth" format="dimension"/>
+        <attr name="strokeWidth" format="dimension"/>
+        <attr name="gapWidth" format="dimension"/>
     </declare-styleable>
 </resources>

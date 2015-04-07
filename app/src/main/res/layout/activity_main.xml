@@ -11,13 +11,19 @@
         android:id="@+id/cr"
         android:visibility="visible"
         android:padding="10dp"
-        custom:thickness="60dp"
         android:background="#aaffdd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <SeekBar
-        android:id="@+id/sb"
+        android:id="@+id/sb_ring"
+        android:progress="50"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <SeekBar
+        android:id="@+id/sb_gap"
+        android:progress="50"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

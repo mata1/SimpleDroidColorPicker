@@ -10,7 +10,6 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -26,9 +25,12 @@ public class ColorRingPicker extends View {
     private Paint mRingPaint, mStrokePaint, mInnerPaint, mInnerStrokePaint, mHandlePaint;
     private RectF mHandleRect;
 
-    private int mThickness;
+    private int mRingWidth, mStrokeWidth, mGapWidth;
 
     private float mAngle; // current selection angle
+    private boolean mDragging; // whether handle is being dragged
+
+    private static final int HANDLE_TOUCH_LIMIT = 15;
 
     public ColorRingPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -36,7 +38,9 @@ public class ColorRingPicker extends View {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ColorPicker);
 
         try {
-            mThickness = a.getDimensionPixelSize(R.styleable.ColorPicker_thickness, 50);
+            mRingWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_ringWidth, 50);
+            mStrokeWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_strokeWidth, 5);
+            mGapWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_gapWidth, 50);
         } finally {
             a.recycle();
         }
@@ -44,23 +48,23 @@ public class ColorRingPicker extends View {
         mRingPaint = new Paint();
         mRingPaint.setStyle(Paint.Style.STROKE);
         mRingPaint.setAntiAlias(true);
-        mRingPaint.setStrokeWidth(mThickness);
+        mRingPaint.setStrokeWidth(mRingWidth);
 
         mStrokePaint = new Paint(mRingPaint);
         mStrokePaint.setColor(Color.WHITE);
-        mStrokePaint.setStrokeWidth(mThickness+10);
+        mStrokePaint.setStrokeWidth(mRingWidth + mStrokeWidth * 2);
 
         mInnerPaint = new Paint(mRingPaint);
         mInnerPaint.setStyle(Paint.Style.FILL);
         mInnerPaint.setColor(Color.RED);
 
         mInnerStrokePaint = new Paint(mRingPaint);
-        mInnerStrokePaint.setStrokeWidth(10);
+        mInnerStrokePaint.setStrokeWidth(mStrokeWidth * 2);
         mInnerStrokePaint.setStyle(Paint.Style.STROKE);
         mInnerStrokePaint.setColor(Color.WHITE);
 
         mHandlePaint = new Paint(mInnerStrokePaint);
-        mHandlePaint.setStrokeWidth(10/2f);
+        mHandlePaint.setStrokeWidth(mStrokeWidth);
 
         mHandleRect = new RectF();
     }
@@ -86,10 +90,9 @@ public class ColorRingPicker extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        float GAP = 50; // TODO change to global, add setter
         float center = Math.min(getWidth(), getHeight())/2f;
         float rOuter = center - mStrokePaint.getStrokeWidth()/2 - getPaddingTop();
-        float rInner = rOuter - mStrokePaint.getStrokeWidth()/2 - GAP;
+        float rInner = rOuter - mStrokePaint.getStrokeWidth()/2 - mGapWidth;
         float w = getWidth()/2f, h = getHeight()/2f;
 
         mHandleRect.set(
@@ -113,8 +116,6 @@ public class ColorRingPicker extends View {
         canvas.rotate(mAngle, w, h);
         canvas.drawRoundRect(mHandleRect, 5, 5, mHandlePaint);
         canvas.restore();
-
-        Log.i("ColorRing", "drawing");
     }
 
     @Override
@@ -128,32 +129,34 @@ public class ColorRingPicker extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_MOVE:
                 // TODO check if touching ring
-                mAngle = (float)getAngleDeg(x, y);
-                invalidate();
+                if (mDragging) {
+                    mAngle = getAngleDeg(x, y);
+                    invalidate();
+                }
 
                 break;
             case MotionEvent.ACTION_UP:
-                // TODO check if touching center, fire event
+                // release handle
+                mDragging = false;
+
+                // TODO check if touching center
                 if (mListener != null)
                     mListener.colorPicked(Utils.getColorFromAngle(mAngle));
 
                 // TODO check if touching ring
-                float newAngle = (float)getAngleDeg(x, y);
+                float newAngle = getAngleDeg(x, y);
                 float diff = mAngle - newAngle;
 
                 // correct angles
                 if (diff < -180) diff += 360;
                 else if (diff > 180) diff -= 360;
 
-                if (mAngle > 360) mAngle -= 360;
-                else if (mAngle < 0) mAngle += 360;
-
                 // start animating
                 ValueAnimator anim = ValueAnimator.ofFloat(mAngle, mAngle - diff);
                 anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
-                        mAngle = (float) animation.getAnimatedValue();
+                        mAngle = (float)animation.getAnimatedValue();
                         invalidate();
                     }
                 });
@@ -161,6 +164,9 @@ public class ColorRingPicker extends View {
                 break;
             case MotionEvent.ACTION_DOWN:
                 // TODO check if touching ring
+                float absDiff = Math.abs(getAngleDeg(x, y) - mAngle);
+                if (absDiff < HANDLE_TOUCH_LIMIT)
+                    mDragging = true;
                 break;
         }
 
@@ -171,19 +177,20 @@ public class ColorRingPicker extends View {
         return Math.atan2(getWidth()/2f - x, getHeight()/2f - y) * -1 + Math.PI/2;
     }
 
-    private double getAngleDeg(float x, float y) {
-        return Math.toDegrees(getAngle(x, y));
+    private float getAngleDeg(float x, float y) {
+        return (float)Math.toDegrees(getAngle(x, y));
     }
 
-    public void setThickness(int thickness) {
-        mThickness = thickness;
-        mRingPaint.setStrokeWidth(mThickness);
-        mStrokePaint.setStrokeWidth(mThickness + 10);
+    public void setRingWidth(int ringWidth) {
+        mRingWidth = ringWidth;
+        mRingPaint.setStrokeWidth(mRingWidth);
+        mStrokePaint.setStrokeWidth(mRingWidth + mStrokeWidth * 2);
         invalidate();
     }
 
-    public int getThickness() {
-        return mThickness;
+    public void setGapWidth(int gapWidth) {
+        mGapWidth = gapWidth;
+        invalidate();
     }
 
     private float[] getAllPositions() {
@@ -204,6 +211,10 @@ public class ColorRingPicker extends View {
 
         return c;
     }
+
+    /*
+    INTERFACE
+     */
 
     public interface OnColorPickedListener{
         public void colorPicked(int color);
