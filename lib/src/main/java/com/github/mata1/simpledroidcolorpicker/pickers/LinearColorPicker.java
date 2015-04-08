@@ -9,7 +9,6 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import com.github.mata1.simpledroidcolorpicker.utils.Utils;
@@ -90,15 +89,8 @@ public class LinearColorPicker extends ColorPicker {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int[] location = new int[2];
-        getLocationOnScreen(location);
-
-        float x = event.getRawX() - location[0];
-        float y = event.getRawY() - location[1];
-
-
-        switch (event.getAction()) {
+    protected void handleTouch(int motionAction, float x, float y) {
+        switch (motionAction) {
             case MotionEvent.ACTION_DOWN:
                 // if over handle, grab handle
                 mDragging = isTouchingHandle(x);
@@ -139,7 +131,6 @@ public class LinearColorPicker extends ColorPicker {
                 }
                 break;
         }
-        return true;
     }
 
     private boolean isTouchingHandle(float x) {

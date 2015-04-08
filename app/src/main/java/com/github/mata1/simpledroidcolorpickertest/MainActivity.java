@@ -10,15 +10,17 @@ import android.widget.Toast;
 
 import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
+import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Random;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeListener{
 
-    SeekBar sbRing, sbGap;
+    SeekBar sbRing, sbGap, sbStroke;
     RingColorPicker cr;
 
     @Override
@@ -35,28 +37,33 @@ public class MainActivity extends Activity {
         });
 
         sbRing = (SeekBar)findViewById(R.id.sb_ring);
-        sbRing.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                cr.setRingWidth(progress);
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-
+        sbRing.setOnSeekBarChangeListener(this);
         sbGap = (SeekBar)findViewById(R.id.sb_gap);
-        sbGap.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                cr.setGapWidth(progress);
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
+        sbGap.setOnSeekBarChangeListener(this);
+        sbStroke = (SeekBar)findViewById(R.id.sb_stroke);
+        sbStroke.setOnSeekBarChangeListener(this);
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (seekBar.equals(sbRing)) {
+            cr.setRingWidth(progress);
+        } else if (seekBar.equals(sbGap)) {
+            cr.setGapWidth(progress);
+        } else if (seekBar.equals(sbStroke)) {
+            cr.setStrokeWidth(progress);
+            //cr.setStrokeColor(Utils.getColorFromFraction((new Random()).nextFloat()));
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 
     public void save(View v) {
