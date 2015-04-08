@@ -1,5 +1,6 @@
 package com.github.mata1.simpledroidcolorpicker.pickers;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,7 +22,7 @@ public class LinearColorPicker extends ColorPicker {
     private Paint mColorPaint, mStrokePaint, mHandlePaint, mHandleStrokePaint;
     private RectF mRect, mHandleRect;
 
-    private float mFraction;
+    private boolean mDragging;
 
     private static final int HANDLE_WIDTH = 40;
     
@@ -42,7 +43,7 @@ public class LinearColorPicker extends ColorPicker {
         mStrokePaint.setStrokeWidth(5);
 
         mHandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mHandlePaint.setColor(Utils.getColorFromFraction(mFraction));
+        mHandlePaint.setColor(Utils.getColorFromFraction(0));
         mHandleStrokePaint = new Paint(mStrokePaint);
 
 
@@ -57,7 +58,6 @@ public class LinearColorPicker extends ColorPicker {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
-        float hW = w/2f, hH = w/2f;
         float s = mStrokePaint.getStrokeWidth()/2;
 
         mRect.set(
@@ -100,27 +100,50 @@ public class LinearColorPicker extends ColorPicker {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                // TODO check if over handle, grab handle
+                // if over handle, grab handle
+                mDragging = isTouchingHandle(x);
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                // TODO check if handle grabbed
-                if (!isInsideBounds(x))
-                    break;
-                mHandleRect.offsetTo(x - mHandleRect.width()/2, mHandleRect.top);
+                // check if handle grabbed
+                if (mDragging) {
+                    if (!isInsideBounds(x))
+                        break;
+                    mHandleRect.offsetTo(x - mHandleRect.width() / 2, mHandleRect.top);
 
-                mFraction = (mHandleRect.centerX() - mRect.left) / mRect.width();
-                Log.d("fraction, centerx", mFraction+", " + (mHandleRect.centerX() - mRect.left));
-                Log.d("mRect", mRect.toShortString()+ ", " + mRect.width() + ", "+mRect.right);
-                mHandlePaint.setColor(Utils.getColorFromFraction(mFraction));
-                invalidate();
+                    float fraction = (mHandleRect.centerX() - mRect.left) / mRect.width();
+                    mHandlePaint.setColor(Utils.getColorFromFraction(fraction));
+                    invalidate();
+                }
                 break;
 
             case MotionEvent.ACTION_UP:
-                // TODO release handle or move handle
+                // release handle or move handle
+                if (mDragging) {
+                    mDragging = false;
+                } else if (isInsideBounds(x)) {
+                    // start animating
+                    ValueAnimator anim = ValueAnimator.ofFloat(mHandleRect.centerX(), x);
+                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            float newX = (float) animation.getAnimatedValue();
+                            mHandleRect.offsetTo(newX - mHandleRect.width()/2, mHandleRect.top);
+
+                            float fraction = (mHandleRect.centerX() - mRect.left) / mRect.width();
+                            mHandlePaint.setColor(Utils.getColorFromFraction(fraction));
+                            invalidate();
+                        }
+                    });
+                    anim.start();
+                }
                 break;
         }
         return true;
+    }
+
+    private boolean isTouchingHandle(float x) {
+        return x > mHandleRect.left && x < mHandleRect.right;
     }
 
     private boolean isInsideBounds(float x) {
