@@ -94,34 +94,33 @@ public class RingColorPicker extends ColorPicker {
         mInnerRadius = mOuterRadius - mOuterStrokePaint.getStrokeWidth()/2 - mGapWidth;
 
         mHandleRect.set(
-                getPaddingLeft(), // left
-                mHalfHeight - HANDLE_WIDTH/2, // top
-                getPaddingLeft() + mOuterStrokePaint.getStrokeWidth() + HANDLE_PADDING*2, // right
-                mHalfHeight + HANDLE_WIDTH/2 // bottom
+                -mHalfWidth + getPaddingLeft(), // left
+                -HANDLE_WIDTH/2, // top
+                -mHalfWidth + getPaddingLeft() + mOuterStrokePaint.getStrokeWidth() + HANDLE_PADDING*2, // right
+                HANDLE_WIDTH/2 // bottom
         );
 
         // create color ring shader
-        Shader gradientShader = new SweepGradient(mHalfWidth, mHalfHeight, Utils.getHueRingColors(36), null);
+        Shader gradientShader = new SweepGradient(0, 0, Utils.getHueRingColors(36), null);
         mOuterPaint.setShader(gradientShader);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        canvas.translate(mHalfWidth, mHalfHeight);
         // outer ring
-        canvas.drawCircle(mHalfWidth, mHalfHeight, mOuterRadius, mOuterStrokePaint);
-        canvas.drawCircle(mHalfWidth, mHalfHeight, mOuterRadius, mOuterPaint);
+        canvas.drawCircle(0, 0, mOuterRadius, mOuterStrokePaint);
+        canvas.drawCircle(0, 0, mOuterRadius, mOuterPaint);
 
         // inner circle
         mInnerPaint.setColor(Utils.getColorFromAngle(mAngle));
         if (mStrokeWidth != 0)
-            canvas.drawCircle(mHalfWidth, mHalfHeight, mInnerRadius, mInnerStrokePaint);
-        canvas.drawCircle(mHalfWidth, mHalfHeight, mInnerRadius, mInnerPaint);
+            canvas.drawCircle(0, 0, mInnerRadius, mInnerStrokePaint);
+        canvas.drawCircle(0, 0, mInnerRadius, mInnerPaint);
 
         // rotate handle
-        canvas.save();
-        canvas.rotate(mAngle, mHalfWidth, mHalfHeight);
+        canvas.rotate(mAngle);
         canvas.drawRoundRect(mHandleRect, 5, 5, mHandlePaint);
-        canvas.restore();
     }
 
     @Override
