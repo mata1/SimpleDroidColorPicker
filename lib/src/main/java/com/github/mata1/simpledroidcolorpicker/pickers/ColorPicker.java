@@ -2,6 +2,8 @@ package com.github.mata1.simpledroidcolorpicker.pickers;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +18,14 @@ public abstract class ColorPicker extends View {
     protected OnColorPickedListener mOnColorPickedListener;
     protected OnColorChangedListener mOnColorChangedListener;
 
+    protected Paint mHandlePaint, mHandleStrokePaint;
+
+    protected float mHalfWidth, mHalfHeight;
+
+    protected boolean mDragging; // whether handle is being dragged
+
+    protected static final int[] COLORS = new int[] { 0xFFFF0000, 0xFFFFFF00, 0xFF00FF00, 0xFF00FFFF, 0xFF0000FF, 0xFFFF00FF, 0xFFFF0000 };
+
     public ColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
         initAttributes(attrs);
@@ -26,14 +36,25 @@ public abstract class ColorPicker extends View {
         this(context, attrs);
     }
 
-    protected abstract void init();
+    protected void init() {
+        mHandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHandlePaint.setColor(Color.WHITE);
+
+        mHandleStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHandleStrokePaint.setStyle(Paint.Style.STROKE);
+        mHandleStrokePaint.setColor(Color.WHITE);
+        mHandleStrokePaint.setStrokeWidth(4);
+    }
     protected abstract void initAttributes(AttributeSet attrs);
 
     @Override
     protected abstract void onDraw(Canvas canvas);
 
     @Override
-    protected abstract void onSizeChanged(int w, int h, int oldW, int oldH);
+    protected void onSizeChanged(int w, int h, int oldW, int oldH) {
+        mHalfWidth = w / 2f;
+        mHalfHeight = h / 2f;
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -48,6 +69,14 @@ public abstract class ColorPicker extends View {
     }
 
     protected abstract void handleTouch(int motionAction, float x, float y);
+
+    /**
+     * Get current picker color
+     * @return current color
+     */
+    public int getColor() {
+        return mHandlePaint.getColor();
+    }
 
     /**
      * Set listener for color picked event

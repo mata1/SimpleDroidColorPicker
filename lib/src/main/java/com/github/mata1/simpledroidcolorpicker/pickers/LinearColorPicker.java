@@ -18,13 +18,11 @@ import com.github.mata1.simpledroidcolorpicker.utils.Utils;
  */
 public class LinearColorPicker extends ColorPicker {
 
-    private Paint mColorPaint, mStrokePaint, mHandlePaint, mHandleStrokePaint;
+    private Paint mColorPaint, mStrokePaint;
     private RectF mRect, mHandleRect;
 
-    private boolean mDragging;
-
     private static final int HANDLE_WIDTH = 40;
-    
+
     public LinearColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -35,25 +33,22 @@ public class LinearColorPicker extends ColorPicker {
 
     @Override
     protected void init() {
+        super.init();
+
         mColorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mStrokePaint.setStyle(Paint.Style.STROKE);
         mStrokePaint.setColor(Color.WHITE);
-        mStrokePaint.setStrokeWidth(5);
+        mStrokePaint.setStrokeWidth(0);
 
-        mHandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mHandlePaint.setColor(Utils.getColorFromFraction(0));
-        mHandleStrokePaint = new Paint(mStrokePaint);
-
 
         mRect = new RectF();
         mHandleRect = new RectF();
     }
 
     @Override
-    protected void initAttributes(AttributeSet attrs) {
-
-    }
+    protected void initAttributes(AttributeSet attrs) { }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
@@ -73,7 +68,7 @@ public class LinearColorPicker extends ColorPicker {
                 h - getPaddingBottom() - s
         );
 
-        Shader sweep = new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(), Utils.getHueRingColors(50), null, LinearGradient.TileMode.CLAMP);
+        Shader sweep = new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(), COLORS, null, LinearGradient.TileMode.CLAMP);
         mColorPaint.setShader(sweep);
     }
 
@@ -81,7 +76,8 @@ public class LinearColorPicker extends ColorPicker {
     protected void onDraw(Canvas canvas) {
         // draw gradient
         canvas.drawRoundRect(mRect, 10, 10, mColorPaint);
-        canvas.drawRoundRect(mRect, 10, 10, mStrokePaint);
+        if (mStrokePaint.getStrokeWidth() != 0)
+            canvas.drawRoundRect(mRect, 10, 10, mStrokePaint);
 
         // draw handle
         canvas.drawRoundRect(mHandleRect, 5, 5, mHandlePaint);

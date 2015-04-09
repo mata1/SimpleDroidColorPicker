@@ -8,20 +8,18 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
-import com.github.mata1.simpledroidcolorpicker.utils.Utils;
+import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.Random;
 
 
 public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeListener{
 
-    SeekBar sbRing, sbGap, sbStroke;
-    RingColorPicker cr;
+    private SeekBar sbRing, sbGap, sbStroke;
+    private RingColorPicker cr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

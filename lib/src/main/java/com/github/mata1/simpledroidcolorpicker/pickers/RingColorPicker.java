@@ -23,7 +23,6 @@ public class RingColorPicker extends ColorPicker {
 
     private Paint mOuterPaint, mOuterStrokePaint;
     private Paint mInnerPaint, mInnerStrokePaint;
-    private Paint mHandlePaint;
 
     private RectF mHandleRect;
 
@@ -31,7 +30,6 @@ public class RingColorPicker extends ColorPicker {
     private float mInnerRadius, mOuterRadius; // view measurements
 
     private float mAngle; // current selection angle
-    private boolean mDragging; // whether handle is being dragged
 
     // handle constants
     private static final int HANDLE_TOUCH_LIMIT = 15;
@@ -50,21 +48,25 @@ public class RingColorPicker extends ColorPicker {
      * Initialize member objects
      */
     protected void init() {
+        super.init();
+
         // init paints
         mOuterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mOuterPaint.setStyle(Paint.Style.STROKE);
-        mOuterPaint.setColor(Color.WHITE);
         mOuterPaint.setStrokeWidth(mRingWidth);
+        // create color ring shader
+        Shader gradientShader = new SweepGradient(0, 0, COLORS, null);
+        mOuterPaint.setShader(gradientShader);
+
         mOuterStrokePaint = new Paint(mOuterPaint);
+        mOuterStrokePaint.setColor(Color.WHITE);
         mOuterStrokePaint.setStrokeWidth(mRingWidth + mStrokeWidth * 2);
 
         mInnerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mInnerPaint.setStyle(Paint.Style.FILL);
-        mInnerStrokePaint = new Paint(mOuterPaint);
-        mInnerStrokePaint.setStrokeWidth(mStrokeWidth * 2);
+        mInnerStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        mHandlePaint = new Paint(mOuterPaint);
-        mHandlePaint.setStrokeWidth(mStrokeWidth);
+        mInnerStrokePaint.setStyle(Paint.Style.STROKE);
+        mInnerStrokePaint.setStrokeWidth(mStrokeWidth * 2);
 
         // init rectangle
         mHandleRect = new RectF();
@@ -79,7 +81,7 @@ public class RingColorPicker extends ColorPicker {
 
         try {
             mRingWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_ringWidth, HANDLE_WIDTH * 2);
-            mStrokeWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_strokeWidth, 4);
+            mStrokeWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_strokeWidth, 0);
             mGapWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_gapWidth, HANDLE_PADDING + HANDLE_WIDTH);
         } finally {
             a.recycle();
@@ -88,7 +90,9 @@ public class RingColorPicker extends ColorPicker {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
-        float minCenter = Math.min(w / 2f, h / 2f);
+        super.onSizeChanged(w, h, oldW, oldH);
+
+        float minCenter = Math.min(mHalfWidth, mHalfHeight);
         mOuterRadius = minCenter - mOuterStrokePaint.getStrokeWidth()/2 - getMaxPadding() - HANDLE_PADDING;
         mInnerRadius = mOuterRadius - mOuterStrokePaint.getStrokeWidth()/2 - mGapWidth;
 
@@ -98,38 +102,39 @@ public class RingColorPicker extends ColorPicker {
                 -minCenter + getPaddingLeft() + mOuterStrokePaint.getStrokeWidth() + HANDLE_PADDING*2, // right
                 HANDLE_WIDTH/2 // bottom
         );
-
-        // create color ring shader
-        Shader gradientShader = new SweepGradient(0, 0, Utils.getHueRingColors(36), null);
-        mOuterPaint.setShader(gradientShader);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.translate(getWidth() / 2f, getHeight() / 2f);
+        canvas.translate(mHalfWidth, mHalfHeight);
         // outer ring
-        canvas.drawCircle(0, 0, mOuterRadius, mOuterStrokePaint);
+        if (mStrokeWidth != 0)
+            canvas.drawCircle(0, 0, mOuterRadius, mOuterStrokePaint);
         canvas.drawCircle(0, 0, mOuterRadius, mOuterPaint);
 
         // inner circle
         mInnerPaint.setColor(Utils.getColorFromAngle(mAngle));
+
         if (mStrokeWidth != 0)
             canvas.drawCircle(0, 0, mInnerRadius, mInnerStrokePaint);
         canvas.drawCircle(0, 0, mInnerRadius, mInnerPaint);
 
         // rotate handle
         canvas.rotate(mAngle);
+        mHandlePaint.setColor(mInnerPaint.getColor());
         canvas.drawRoundRect(mHandleRect, 5, 5, mHandlePaint);
+        canvas.drawRoundRect(mHandleRect, 5, 5, mHandleStrokePaint);
     }
 
     @Override
     protected void handleTouch(int motionAction, float x, float y) {
-        float halfHeight = getHeight()/2f, halfWidth = getWidth()/2f;
-        float angle = Utils.getAngleDeg(halfWidth, halfHeight, x, y);
-        float dist = Utils.getDistance(halfWidth, halfHeight, x, y);
+        float angle = Utils.getAngleDeg(mHalfWidth, mHalfHeight, x, y);
+        float dist = Utils.getDistance(mHalfWidth, mHalfHeight, x, y);
+
         boolean isTouchingRing = dist > mInnerRadius + mGapWidth - HANDLE_PADDING
                 && dist < mOuterRadius + mOuterStrokePaint.getStrokeWidth()/2 + HANDLE_PADDING;
         boolean isTouchingCenter = dist < mInnerRadius;
+        boolean isOutsideCenter = dist > mInnerRadius;
 
         switch (motionAction) {
             case MotionEvent.ACTION_DOWN:
@@ -141,7 +146,7 @@ public class RingColorPicker extends ColorPicker {
 
             case MotionEvent.ACTION_MOVE:
                 // check if dragging AND touching ring
-                if (mDragging && isTouchingRing) {
+                if (mDragging && isOutsideCenter) {
                     mAngle = angle;
                     invalidate();
                 }
@@ -227,6 +232,4 @@ public class RingColorPicker extends ColorPicker {
         mHandlePaint.setColor(strokeColor);
         invalidate();
     }
-
-
 }
