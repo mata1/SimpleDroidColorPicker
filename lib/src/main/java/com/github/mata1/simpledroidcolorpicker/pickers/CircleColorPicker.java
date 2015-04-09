@@ -1,5 +1,6 @@
 package com.github.mata1.simpledroidcolorpicker.pickers;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -17,7 +18,8 @@ import com.github.mata1.simpledroidcolorpicker.utils.Utils;
  */
 public class CircleColorPicker extends ColorPicker {
 
-    private Paint mCircleColorPaint, mCircleAlphaPaint, mHandlePaint;
+    private Paint mCircleColorPaint, mCircleAlphaPaint;
+    private Paint mHandlePaint, mHandleStrokePaint;
 
     private float mRadius;
 
@@ -39,9 +41,10 @@ public class CircleColorPicker extends ColorPicker {
         mCircleAlphaPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         mHandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mHandlePaint.setColor(Color.WHITE);
-        mHandlePaint.setStyle(Paint.Style.STROKE);
-        mHandlePaint.setStrokeWidth(5);
+        mHandleStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHandleStrokePaint.setColor(Color.WHITE);
+        mHandleStrokePaint.setStyle(Paint.Style.STROKE);
+        mHandleStrokePaint.setStrokeWidth(5);
 
         mHandleRadius = 20;
     }
@@ -55,7 +58,14 @@ public class CircleColorPicker extends ColorPicker {
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
         float halfHeight = h/2f, halfWidth = w/2f;
         float minCenter = Math.min(halfHeight, halfWidth);
-        mRadius = minCenter - getMaxPadding();
+        mRadius = minCenter - getMaxPadding() - mHandleRadius - mHandleStrokePaint.getStrokeWidth()/2;
+
+        // init with center
+        if (mHandleX == 0 && mHandleY == 0) {
+            mHandleX = halfWidth;
+            mHandleY = halfHeight;
+            setColor();
+        }
 
 
         SweepGradient sweepGradient = new SweepGradient(0, 0, Utils.getHueRingColors(36), null);
@@ -75,14 +85,17 @@ public class CircleColorPicker extends ColorPicker {
         canvas.drawCircle(0, 0, mRadius, mCircleAlphaPaint);
         canvas.restore();
 
-        //canvas.translate(-getWidth()/2f, -getHeight()/2f);
         canvas.drawCircle(mHandleX, mHandleY, mHandleRadius, mHandlePaint);
+        canvas.drawCircle(mHandleX, mHandleY, mHandleRadius, mHandleStrokePaint);
     }
 
     @Override
     protected void handleTouch(int motionAction, float x, float y) {
 
-        boolean isInsideBounds = Utils.getDistance(x, y, getWidth()/2f, getHeight()/2f) < mRadius;
+        float halfWidth = getWidth()/2f, halfHeight = getHeight()/2f;
+        float centerDist = Utils.getDistance(x, y, halfWidth, halfHeight);
+        boolean isInsideBounds = centerDist < mRadius;
+
         switch (motionAction) {
             case MotionEvent.ACTION_DOWN:
                 if (Utils.getDistance(x, y, mHandleX, mHandleY) < mHandleRadius * 1.5) {
@@ -92,8 +105,13 @@ public class CircleColorPicker extends ColorPicker {
 
             case MotionEvent.ACTION_MOVE:
                 if (mDragging) {
-                    mHandleX = x;
-                    mHandleY = y;
+                    // clamp to circle edge
+                    double angle = Utils.getAngle(halfWidth, halfHeight, x, y);
+                    double cos = Math.cos(angle) * Math.min(centerDist, mRadius);
+                    double sin = Math.sin(angle) * Math.min(centerDist, mRadius);
+                    mHandleX = (float)-cos + halfWidth;
+                    mHandleY = (float)-sin + halfHeight;
+                    setColor();
                     invalidate();
                 }
 
@@ -104,11 +122,72 @@ public class CircleColorPicker extends ColorPicker {
                     mDragging = false;
                 } else if (isInsideBounds) {
                     // animate move to x, y
-                    mHandleX = x;
-                    mHandleY = y;
-                    invalidate();
+                    /*final double curA = Utils.getAngle(getWidth()/2f, getHeight()/2f, mHandleX, mHandleY);
+                    double newA = Utils.getAngle(getWidth()/2f, getHeight()/2f, x, y);
+                    mHandleDist = Utils.getDistance(mHandleX, mHandleY, getWidth()/2f, getHeight()/2f);
+
+                    ValueAnimator animAngle = ValueAnimator.ofFloat((float)curA, (float)newA);
+                    animAngle.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            float angle = (float) animation.getAnimatedValue();
+                            //float dist = Utils.getDistance(getWidth()/2f, getHeight()/2f, mHandleX, mHandleY);
+                            double cos = Math.cos(angle) * mHandleDist;
+                            double sin = Math.sin(angle) * mHandleDist;
+                            mHandleX = (float)-cos + getWidth()/2f;
+                            mHandleY = (float)-sin + getHeight()/2f;
+                            invalidate();
+                        }
+                    });
+                    animAngle.start();
+
+                    ValueAnimator animDist = ValueAnimator.ofFloat(mHandleDist, centerDist);
+                    animDist.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            mHandleDist = (float) animation.getAnimatedValue();
+                        }
+                    });
+                    animDist.start();*/
+
+                    ValueAnimator animX, animY;
+                    // animate X coordinate
+                    animX = ValueAnimator.ofFloat(mHandleX, x);
+                    animX.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            mHandleX = (float) animation.getAnimatedValue();
+                            //invalidate();
+                        }
+                    });
+                    animX.start();
+
+                    // animate Y coordinate
+                    animY = ValueAnimator.ofFloat(mHandleY, y);
+                    animY.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            mHandleY = (float) animation.getAnimatedValue();
+                            setColor();
+                            invalidate();
+                        }
+                    });
+                    animY.start();
                 }
                 break;
         }
     }
-}
+
+    private void setColor() {
+        float halfWidth = getWidth()/2f, halfHeight = getHeight()/2f;
+
+        float hue = Utils.getAngleDeg(halfWidth, halfHeight, mHandleX, mHandleY);
+        float sat = Utils.getDistance(halfWidth, halfHeight, mHandleX, mHandleY) / mRadius;
+
+        mHandlePaint.setColor(Utils.getColorFromAngle(hue, sat, 1));
+    }
+
+    public int getColor() {
+        return mHandlePaint.getColor();
+    }
+ }
