@@ -1,21 +1,17 @@
-# SimpleDroidColorPicker
+# SimpleDroidColorPicker ![icon](https://github.com/mata1/SimpleDroidColorPicker/blob/master/screenshots/icon.png)
 **SimpleDroidColorPicker** is a simple, easy-to-use color picker library for Android.
 
-Currently it is in pre-release and supports only **ring** color picker.
-Other types will be added soon.
+Currently it is in pre-release and supports **ring**, **circular** and **linear** color pickers.
 
-Current version **v0.1** supports:
-* ring color picker
-* cahnging color with clicking and dragging handle
+Current version **v0.2** supports:
+* ring color picker, circle color picker, linear color picker
+* changing colors with either clicking or dragging handle
+* animations
 * XML attributes
-* onColorChanged listener
+* onColorSelected and onColorChanged listeners
 * setters/getters
 
-**v0.1:**
-
-![ScreenShot](https://github.com/mata1/SimpleDroidColorPicker/blob/master/screenshots/v0.1.png)
-
-![test](https://cloud.githubusercontent.com/assets/5882169/7033316/88769fc4-dd79-11e4-842c-550f8e23406b.png)
+![ColorPickers](https://github.com/mata1/SimpleDroidColorPicker/blob/master/screenshots/v0.2.png)
 
 #How to use
 Add this to your `build.gradle` file:
