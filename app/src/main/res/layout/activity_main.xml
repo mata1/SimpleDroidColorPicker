@@ -17,12 +17,16 @@
         android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="80dp" />
+    
+    <com.github.mata1.simpledroidcolorpicker.pickers.CircleColorPicker
+        android:layout_width="match_parent"
+        android:layout_height="200dp" />
 
     <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
         android:visibility="gone"
-        android:padding="30dp"
+        android:padding="10dp"
         android:layout_width="match_parent"
-        android:layout_height="100dp" />
+        android:layout_height="70dp" />
 
     <com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker
         android:id="@+id/cr"
@@ -30,7 +34,9 @@
         android:padding="10dp"
         android:background="#00aaffdd"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:layout_height="200dp" />
 
     <SeekBar
         android:id="@+id/sb_ring"
