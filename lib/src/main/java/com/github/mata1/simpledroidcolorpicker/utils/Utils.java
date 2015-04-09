@@ -13,10 +13,21 @@ public class Utils {
      * @return color at specific hue angle
      */
     public static int getColorFromAngle(float angle) {
+        return getColorFromAngle(angle, 1, 1);
+    }
+
+    /**
+     * Get color at specific hue angle, saturation and value
+     * @param angle angle in degrees
+     * @param saturation color saturation
+     * @param value color value
+     * @return color at specific hue angle, saturation and value
+     */
+    public static int getColorFromAngle(float angle, float saturation, float value) {
         angle -= 180;
         if (angle < 0) angle += 360;
         if (angle >= 360) angle -= 360;
-        return Color.HSVToColor(new float[]{angle, 1, 1});
+        return Color.HSVToColor(new float[] { angle, saturation, value });
     }
 
     /**
@@ -75,7 +86,7 @@ public class Utils {
      * @return distance between two points
      */
     public static float getDistance(float x1, float y1, float x2, float y2) {
-        return (float)Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+        return (float)Math.hypot(x1 - x2, y1 - y2);
     }
 
     /**

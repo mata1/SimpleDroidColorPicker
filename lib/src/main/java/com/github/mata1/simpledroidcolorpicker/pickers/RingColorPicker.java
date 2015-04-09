@@ -28,11 +28,12 @@ public class RingColorPicker extends ColorPicker {
     private RectF mHandleRect;
 
     private int mRingWidth, mStrokeWidth, mGapWidth; // view attributes
-    private float mInnerRadius, mOuterRadius, mHalfWidth, mHalfHeight; // view measurements
+    private float mInnerRadius, mOuterRadius; // view measurements
 
     private float mAngle; // current selection angle
     private boolean mDragging; // whether handle is being dragged
 
+    // handle constants
     private static final int HANDLE_TOUCH_LIMIT = 15;
     private static final int HANDLE_WIDTH = 40;
     private static final int HANDLE_PADDING = 10;
@@ -57,9 +58,8 @@ public class RingColorPicker extends ColorPicker {
         mOuterStrokePaint = new Paint(mOuterPaint);
         mOuterStrokePaint.setStrokeWidth(mRingWidth + mStrokeWidth * 2);
 
-        mInnerPaint = new Paint(mOuterPaint);
+        mInnerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mInnerPaint.setStyle(Paint.Style.FILL);
-        mInnerPaint.setColor(Color.RED);
         mInnerStrokePaint = new Paint(mOuterPaint);
         mInnerStrokePaint.setStrokeWidth(mStrokeWidth * 2);
 
@@ -78,9 +78,9 @@ public class RingColorPicker extends ColorPicker {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ColorPicker);
 
         try {
-            mRingWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_ringWidth, 50);
-            mStrokeWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_strokeWidth, 5);
-            mGapWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_gapWidth, 50);
+            mRingWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_ringWidth, HANDLE_WIDTH * 2);
+            mStrokeWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_strokeWidth, 4);
+            mGapWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_gapWidth, HANDLE_PADDING + HANDLE_WIDTH);
         } finally {
             a.recycle();
         }
@@ -88,15 +88,14 @@ public class RingColorPicker extends ColorPicker {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
-        mHalfWidth = w / 2f;
-        mHalfHeight = h / 2f;
-        mOuterRadius = Math.min(mHalfWidth, mHalfHeight) - mOuterStrokePaint.getStrokeWidth()/2 - getMaxPadding() - HANDLE_PADDING;
+        float minCenter = Math.min(w / 2f, h / 2f);
+        mOuterRadius = minCenter - mOuterStrokePaint.getStrokeWidth()/2 - getMaxPadding() - HANDLE_PADDING;
         mInnerRadius = mOuterRadius - mOuterStrokePaint.getStrokeWidth()/2 - mGapWidth;
 
         mHandleRect.set(
-                -mHalfWidth + getPaddingLeft(), // left
+                -minCenter + getPaddingLeft(), // left
                 -HANDLE_WIDTH/2, // top
-                -mHalfWidth + getPaddingLeft() + mOuterStrokePaint.getStrokeWidth() + HANDLE_PADDING*2, // right
+                -minCenter + getPaddingLeft() + mOuterStrokePaint.getStrokeWidth() + HANDLE_PADDING*2, // right
                 HANDLE_WIDTH/2 // bottom
         );
 
@@ -107,7 +106,7 @@ public class RingColorPicker extends ColorPicker {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.translate(mHalfWidth, mHalfHeight);
+        canvas.translate(getWidth() / 2f, getHeight() / 2f);
         // outer ring
         canvas.drawCircle(0, 0, mOuterRadius, mOuterStrokePaint);
         canvas.drawCircle(0, 0, mOuterRadius, mOuterPaint);
@@ -125,9 +124,11 @@ public class RingColorPicker extends ColorPicker {
 
     @Override
     protected void handleTouch(int motionAction, float x, float y) {
-        float angle = Utils.getAngleDeg(mHalfWidth, mHalfHeight, x, y);
-        float dist = Utils.getDistance(mHalfWidth, mHalfHeight, x, y);
-        boolean isTouchingRing = dist > mInnerRadius + mGapWidth && dist < mOuterRadius + mOuterStrokePaint.getStrokeWidth();
+        float halfHeight = getHeight()/2f, halfWidth = getWidth()/2f;
+        float angle = Utils.getAngleDeg(halfWidth, halfHeight, x, y);
+        float dist = Utils.getDistance(halfWidth, halfHeight, x, y);
+        boolean isTouchingRing = dist > mInnerRadius + mGapWidth - HANDLE_PADDING
+                && dist < mOuterRadius + mOuterStrokePaint.getStrokeWidth()/2 + HANDLE_PADDING;
         boolean isTouchingCenter = dist < mInnerRadius;
 
         switch (motionAction) {
@@ -183,8 +184,7 @@ public class RingColorPicker extends ColorPicker {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int min = Math.min(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
-        int spec = MeasureSpec.makeMeasureSpec(min, MeasureSpec.EXACTLY);
-        setMeasuredDimension(spec, spec);
+        setMeasuredDimension(min, min);
     }
 
     /**
@@ -228,11 +228,5 @@ public class RingColorPicker extends ColorPicker {
         invalidate();
     }
 
-    /**
-     * Get view maximum padding
-     * @return maximum padding
-     */
-    private int getMaxPadding() {
-        return Math.max(Math.max(getPaddingLeft(), getPaddingRight()), Math.max(getPaddingTop(), getPaddingBottom()));
-    }
+
 }

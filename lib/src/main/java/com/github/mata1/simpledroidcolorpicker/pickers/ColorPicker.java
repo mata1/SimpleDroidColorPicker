@@ -66,4 +66,12 @@ public abstract class ColorPicker extends View {
     public void setOnColorChangedListener(OnColorChangedListener eventListener) {
         mOnColorChangedListener = eventListener;
     }
+
+    /**
+     * Get view maximum padding
+     * @return maximum padding
+     */
+    protected int getMaxPadding() {
+        return Math.max(Math.max(getPaddingLeft(), getPaddingRight()), Math.max(getPaddingTop(), getPaddingBottom()));
+    }
 }
