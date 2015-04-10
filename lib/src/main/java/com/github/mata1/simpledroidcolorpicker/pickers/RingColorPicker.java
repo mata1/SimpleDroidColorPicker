@@ -4,7 +4,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.SweepGradient;
@@ -55,9 +54,9 @@ public class RingColorPicker extends ColorPicker {
         mColorPaint.setShader(new SweepGradient(0, 0, COLORS, null));
 
         mInnerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mInnerPaint.setColor(Color.CYAN);
+        mInnerPaint.setColor(COLORS[0]);
 
-        mHandlePaint.setColor(Color.CYAN);
+        mHandlePaint.setColor(COLORS[0]);
 
         // init rectangle
         mHandleRect = new RectF();
@@ -88,12 +87,11 @@ public class RingColorPicker extends ColorPicker {
         mInnerRadius = mOuterRadius - mColorPaint.getStrokeWidth()/2 - mGapWidth;
 
         mHandleRect.set(
-                -minCenter + getPaddingLeft(), // left
+                mInnerRadius + mGapWidth - HANDLE_PADDING, // left
                 -HANDLE_WIDTH/2, // top
-                -minCenter + getPaddingLeft() + mColorPaint.getStrokeWidth() + HANDLE_PADDING*2, // right
+                mOuterRadius + mColorPaint.getStrokeWidth()/2f + HANDLE_PADDING, // right
                 HANDLE_WIDTH/2 // bottom
         );
-
     }
 
     @Override
@@ -113,8 +111,12 @@ public class RingColorPicker extends ColorPicker {
 
     @Override
     protected void handleTouch(int motionAction, float x, float y) {
-        float angle = Utils.getAngleDeg(mHalfWidth, mHalfHeight, x, y);
-        float dist = Utils.getDistance(mHalfWidth, mHalfHeight, x, y);
+        // set origin to center
+        x -= mHalfWidth;
+        y -= mHalfHeight;
+
+        float angle = Utils.getAngleDeg(0, 0, x, y);
+        float dist = Utils.getDistance(0, 0, x, y);
 
         boolean isTouchingRing = dist > mInnerRadius + mGapWidth - HANDLE_PADDING
                 && dist < mOuterRadius + mColorPaint.getStrokeWidth()/2 + HANDLE_PADDING;
@@ -176,6 +178,7 @@ public class RingColorPicker extends ColorPicker {
     private void moveHandleTo(float angle) {
         mAngle = angle;
         int color = Utils.getColorFromAngle(mAngle);
+
         mInnerPaint.setColor(color);
         mHandlePaint.setColor(color);
         invalidate();

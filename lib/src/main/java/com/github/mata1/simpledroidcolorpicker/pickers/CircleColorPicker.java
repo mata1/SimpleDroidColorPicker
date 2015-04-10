@@ -83,8 +83,8 @@ public class CircleColorPicker extends ColorPicker {
                 if (mDragging) {
                     // clamp to circle edge
                     double angle = Utils.getAngle(0, 0, x, y);
-                    mHandleX = (float)-Math.cos(angle) * Math.min(centerDist, mRadius);
-                    mHandleY = (float)-Math.sin(angle) * Math.min(centerDist, mRadius);
+                    mHandleX = (float)Math.cos(angle) * Math.min(centerDist, mRadius);
+                    mHandleY = (float)Math.sin(angle) * Math.min(centerDist, mRadius);
                     setHandleColor();
                 }
 

@@ -24,7 +24,6 @@ public class Utils {
      * @return color at specific hue angle, saturation and value
      */
     public static int getColorFromAngle(float angle, float saturation, float value) {
-        angle -= 180;
         if (angle < 0) angle += 360;
         if (angle >= 360) angle -= 360;
         return Color.HSVToColor(new float[] { angle, saturation, value });
@@ -62,7 +61,7 @@ public class Utils {
      * @return angle in radians
      */
     public static double getAngle(float x1, float y1, float x2, float y2) {
-        return Math.atan2(x1 - x2, y1 - y2) * -1 + Math.PI/2;
+        return Math.atan2(x1 - x2, y1 - y2) * -1 - Math.PI/2;
     }
 
     /**

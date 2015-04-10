@@ -36,7 +36,7 @@ public class LinearColorPicker extends ColorPicker {
     protected void init() {
         super.init();
 
-        mHandlePaint.setColor(Utils.getColorFromFraction(0));
+        mHandlePaint.setColor(COLORS[0]);
 
         mRect = new RectF();
         mHandleRect = new RectF();
