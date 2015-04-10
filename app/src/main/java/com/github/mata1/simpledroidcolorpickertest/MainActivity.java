@@ -49,8 +49,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         } else if (seekBar.equals(sbGap)) {
             cr.setGapWidth(progress);
         } else if (seekBar.equals(sbStroke)) {
-            cr.setStrokeWidth(progress);
-            //cr.setStrokeColor(Utils.getColorFromFraction((new Random()).nextFloat()));
+
         }
     }
 

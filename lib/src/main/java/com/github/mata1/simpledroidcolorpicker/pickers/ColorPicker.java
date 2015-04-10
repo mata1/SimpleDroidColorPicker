@@ -18,6 +18,7 @@ public abstract class ColorPicker extends View {
     protected OnColorPickedListener mOnColorPickedListener;
     protected OnColorChangedListener mOnColorChangedListener;
 
+    protected Paint mColorPaint;
     protected Paint mHandlePaint, mHandleStrokePaint;
 
     protected float mHalfWidth, mHalfHeight;
@@ -37,6 +38,8 @@ public abstract class ColorPicker extends View {
     }
 
     protected void init() {
+        mColorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
         mHandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mHandlePaint.setColor(Color.WHITE);
 
