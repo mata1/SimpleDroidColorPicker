@@ -17,7 +17,7 @@ import com.github.mata1.simpledroidcolorpicker.utils.Utils;
  */
 public class LinearColorPicker extends RectHandleColorPicker {
 
-    private RectF mRect;
+    protected RectF mRect;
 
     private static final int RECT_EDGE_RADIUS = 10;
 

@@ -78,7 +78,7 @@ public class ColorUtils {
      * @param color color
      * @return HSV array, length = 3
      */
-    private static float[] getHSVFromColor(int color) {
+    public static float[] getHSVFromColor(int color) {
         float hsv[] = new float[3];
         Color.colorToHSV(color, hsv);
         return hsv;
