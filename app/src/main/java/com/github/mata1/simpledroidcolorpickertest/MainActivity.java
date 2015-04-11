@@ -12,7 +12,7 @@ import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
 import com.github.mata1.simpledroidcolorpicker.pickers.CircleColorPicker;
 import com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker;
 import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
-import com.github.mata1.simpledroidcolorpicker.utils.Utils;
+import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -73,7 +73,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
     public void randomColor(View v) {
         Random r = new Random();
-        int color = Utils.getColorFromAngle(r.nextInt(360), r.nextFloat(), 1);
+        int color = ColorUtils.getColorFromHSV(r.nextInt(360), r.nextFloat(), 1);
         rcp.setColor(color);
         ccp.setColor(color);
         lcp.setColor(color);

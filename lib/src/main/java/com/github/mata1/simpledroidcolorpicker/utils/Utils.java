@@ -1,82 +1,9 @@
 package com.github.mata1.simpledroidcolorpicker.utils;
 
-import android.graphics.Color;
-
 /**
  * Utilities class
  */
 public class Utils {
-
-    /**
-     * Get color at specific hue angle
-     * @param angle angle in degrees
-     * @return color at specific hue angle
-     */
-    public static int getColorFromAngle(float angle) {
-        return getColorFromAngle(angle, 1, 1);
-    }
-
-    /**
-     * Get color at specific hue angle, saturation and value
-     * @param angle angle in degrees
-     * @param saturation color saturation
-     * @param value color value
-     * @return color at specific hue angle, saturation and value
-     */
-    public static int getColorFromAngle(float angle, float saturation, float value) {
-        if (angle < 0) angle += 360;
-        if (angle >= 360) angle -= 360;
-        return Color.HSVToColor(new float[] { angle, saturation, value });
-    }
-
-    /**
-     * Get color from float between 0 and 1
-     * @param fraction float between 0 and 1
-     * @return color from fraction
-     */
-    public static int getColorFromFraction(float fraction) {
-        return Color.HSVToColor(new float[] { fraction*360, 1, 1 });
-    }
-
-    /**
-     * Get fraction of hue from color
-     * @param color color
-     * @return hue/360, 0..1
-     */
-    public static float getFractionFromColor(int color) {
-        return getHueFromColor(color)/360;
-    }
-
-    /**
-     * Get hue from color
-     * @param color color
-     * @return color hue value, 0..360
-     */
-    public static float getHueFromColor(int color) {
-        float hsv[] = new float[3];
-        Color.colorToHSV(color, hsv);
-        return hsv[0];
-    }
-
-    public static float getSaturationFromColor(int color) {
-        float hsv[] = new float[3];
-        Color.colorToHSV(color, hsv);
-        return hsv[1];
-    }
-
-    /**
-     * Get hue ring color array
-     * @param n number of colors in array
-     * @return hue color array
-     */
-    public static int[] getHueRingColors(int n) {
-        int[] c = new int[n];
-
-        for (int i = 0; i < n; i++)
-            c[i] = Color.HSVToColor(new float[]{(float)i / n * 360, 1, 1});
-
-        return c;
-    }
 
     /**
      * Get angle between two points
@@ -133,17 +60,6 @@ public class Utils {
      * @return clamped value
      */
     public static float clamp(float val, float min, float max) {
-        return Math.max(min, Math.min(max, val));
-    }
-
-    /**
-     * Clamp integer value between min and max
-     * @param val value to be clamped
-     * @param min minimum value
-     * @param max maximum value
-     * @return clamped value
-     */
-    public static int clamp(int val, int min, int max) {
         return Math.max(min, Math.min(max, val));
     }
 }

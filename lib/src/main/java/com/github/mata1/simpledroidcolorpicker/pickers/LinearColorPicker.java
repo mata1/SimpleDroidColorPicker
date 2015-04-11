@@ -9,20 +9,17 @@ import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 
 /**
  * Linear Color Picker View
  */
-public class LinearColorPicker extends ColorPicker {
+public class LinearColorPicker extends RectHandleColorPicker {
 
-    private RectF mRect, mHandleRect;
+    private RectF mRect;
 
-    private static final int HANDLE_WIDTH = 40;
-    private static final int HANDLE_PADDING = 10;
-
-    private static final int RECT_RADIUS = 10;
-    private static final int HANDLE_RADIUS = 5;
+    private static final int RECT_EDGE_RADIUS = 10;
 
     public LinearColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -39,7 +36,6 @@ public class LinearColorPicker extends ColorPicker {
         mHandlePaint.setColor(COLORS[0]);
 
         mRect = new RectF();
-        mHandleRect = new RectF();
     }
 
     @Override
@@ -66,11 +62,11 @@ public class LinearColorPicker extends ColorPicker {
     @Override
     protected void onDraw(Canvas canvas) {
         // draw gradient
-        canvas.drawRoundRect(mRect, RECT_RADIUS, RECT_RADIUS, mColorPaint);
+        canvas.drawRoundRect(mRect, RECT_EDGE_RADIUS, RECT_EDGE_RADIUS, mColorPaint);
 
         // draw handle
-        canvas.drawRoundRect(mHandleRect, HANDLE_RADIUS, HANDLE_RADIUS, mHandlePaint);
-        canvas.drawRoundRect(mHandleRect, HANDLE_RADIUS, HANDLE_RADIUS, mHandleStrokePaint);
+        canvas.drawRoundRect(mHandleRect, HANDLE_EDGE_RADIUS, HANDLE_EDGE_RADIUS, mHandlePaint);
+        canvas.drawRoundRect(mHandleRect, HANDLE_EDGE_RADIUS, HANDLE_EDGE_RADIUS, mHandleStrokePaint);
     }
 
     @Override
@@ -102,14 +98,15 @@ public class LinearColorPicker extends ColorPicker {
      * X is clamped so handle does not leave bounds.
      * @param x new handle position
      */
-    private void moveHandleTo(float x) {
+    @Override
+    protected void moveHandleTo(float x) {
         // move
         x = Utils.clamp(x, mRect.left, mRect.right);
         mHandleRect.offsetTo(x - mHandleRect.width()/2, mHandleRect.top);
 
         // repaint
         float fraction = (x - mRect.left) / mRect.width();
-        int color = Utils.getColorFromFraction(fraction);
+        int color = ColorUtils.getColorFromFraction(fraction);
         mHandlePaint.setColor(color);
         invalidate();
 
@@ -122,7 +119,8 @@ public class LinearColorPicker extends ColorPicker {
      * Animate handle to new position
      * @param x new handle position
      */
-    private void animateHandleTo(float x) {
+    @Override
+    protected void animateHandleTo(float x) {
         ValueAnimator anim = ValueAnimator.ofFloat(mHandleRect.centerX(), x);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -139,7 +137,7 @@ public class LinearColorPicker extends ColorPicker {
 
     @Override
     public void setColor(int color) {
-        float fraction = Utils.getFractionFromColor(color);
+        float fraction = ColorUtils.getFractionFromColor(color);
         float newX = fraction * mRect.width() + mRect.left;
         animateHandleTo(newX);
     }

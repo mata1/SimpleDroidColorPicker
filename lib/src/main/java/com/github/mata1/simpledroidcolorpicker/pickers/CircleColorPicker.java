@@ -11,20 +11,17 @@ import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 
 /**
  * Circular Color Picker View
  */
-public class CircleColorPicker extends ColorPicker {
+public class CircleColorPicker extends CircleHandleColorPicker {
 
     private Paint mAlphaPaint;
 
     private float mRadius;
-
-    private float mHandleX, mHandleY; // handle center
-
-    private static final int HANDLE_RADIUS = 30;
 
     public CircleColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -82,7 +79,7 @@ public class CircleColorPicker extends ColorPicker {
                     double angle = Utils.getAngle(0, 0, x, y);
                     mHandleX = (float)Math.cos(angle) * Math.min(centerDist, mRadius);
                     mHandleY = (float)Math.sin(angle) * Math.min(centerDist, mRadius);
-                    setHandleColor();
+                    moveHandleTo();
                 }
                 break;
 
@@ -104,10 +101,11 @@ public class CircleColorPicker extends ColorPicker {
     /**
      * Set handle color based on current position
      */
-    private void setHandleColor() {
+    @Override
+    protected void moveHandleTo() {
         float hue = Utils.getAngleDeg(0, 0, mHandleX, mHandleY);
         float sat = Utils.getDistance(0, 0, mHandleX, mHandleY) / mRadius;
-        int color = Utils.getColorFromAngle(hue, sat, 1);
+        int color = ColorUtils.getColorFromHSV(hue, sat, 1);
 
         // repaint
         mHandlePaint.setColor(color);
@@ -118,7 +116,13 @@ public class CircleColorPicker extends ColorPicker {
             mOnColorChangedListener.colorChanged(color);
     }
 
-    private void animateHandleTo(float x, float y) {
+    /**
+     * Animate handle to new position
+     * @param x new x
+     * @param y new y
+     */
+    @Override
+    protected void animateHandleTo(float x, float y) {
         PropertyValuesHolder xHolder = PropertyValuesHolder.ofFloat("x", mHandleX, x);
         PropertyValuesHolder yHolder = PropertyValuesHolder.ofFloat("y", mHandleY, y);
 
@@ -128,7 +132,7 @@ public class CircleColorPicker extends ColorPicker {
             public void onAnimationUpdate(ValueAnimator val) {
                 mHandleX = (float)val.getAnimatedValue("x");
                 mHandleY = (float)val.getAnimatedValue("y");
-                setHandleColor();
+                moveHandleTo();
             }
         });
         anim.start();
@@ -140,8 +144,8 @@ public class CircleColorPicker extends ColorPicker {
 
     @Override
     public void setColor(int color) {
-        float hue = Utils.getHueFromColor(color);
-        float sat = Utils.getSaturationFromColor(color);
+        float hue = ColorUtils.getHueFromColor(color);
+        float sat = ColorUtils.getSaturationFromColor(color);
         float x = (float)Math.cos(Math.toRadians(hue)) * sat * mRadius;
         float y = (float)Math.sin(Math.toRadians(hue)) * sat * mRadius;
         animateHandleTo(x, y);
