@@ -67,11 +67,13 @@ public class RingColorPicker extends ColorPicker {
      * @param attrs xml attribute set
      */
     protected void initAttributes(AttributeSet attrs) {
-        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ColorPicker);
+        super.initAttributes(attrs);
+
+        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.RingColorPicker);
 
         try {
-            mRingWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_ringWidth, HANDLE_WIDTH * 2);
-            mGapWidth = a.getDimensionPixelSize(R.styleable.ColorPicker_gapWidth, HANDLE_PADDING + HANDLE_WIDTH);
+            mRingWidth = a.getDimensionPixelSize(R.styleable.RingColorPicker_ringWidth, HANDLE_WIDTH * 2);
+            mGapWidth = a.getDimensionPixelSize(R.styleable.RingColorPicker_gapWidth, HANDLE_PADDING + HANDLE_WIDTH);
         } finally {
             a.recycle();
         }
@@ -81,9 +83,7 @@ public class RingColorPicker extends ColorPicker {
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
         super.onSizeChanged(w, h, oldW, oldH);
 
-        float minCenter = Math.min(mHalfWidth, mHalfHeight);
-        int maxPadding = getMaxPadding();
-        mOuterRadius = minCenter - mColorPaint.getStrokeWidth()/2 - maxPadding - HANDLE_PADDING;
+        mOuterRadius = Math.min(mHalfWidth, mHalfHeight) - mColorPaint.getStrokeWidth()/2 - getMaxPadding() - HANDLE_PADDING;
         mInnerRadius = mOuterRadius - mColorPaint.getStrokeWidth()/2 - mGapWidth;
 
         mHandleRect.set(
@@ -115,7 +115,7 @@ public class RingColorPicker extends ColorPicker {
         x -= mHalfWidth;
         y -= mHalfHeight;
 
-        float angle = Utils.getAngleDeg(0, 0, x, y);
+        float angle = Utils.normalizeAngle(Utils.getAngleDeg(0, 0, x, y));
         float dist = Utils.getDistance(0, 0, x, y);
 
         boolean isTouchingRing = dist > mInnerRadius + mGapWidth - HANDLE_PADDING
@@ -145,25 +145,7 @@ public class RingColorPicker extends ColorPicker {
                     mOnColorPickedListener.colorPicked(Utils.getColorFromAngle(mAngle));
                     playSoundEffect(SoundEffectConstants.CLICK);
                 } else if (isTouchingRing) {
-                    // move handle if touching ring
-                    float diff = mAngle - angle;
-
-                    // correct angles
-                    if (diff < -180) diff += 360;
-                    else if (diff > 180) diff -= 360;
-
-                    if (mAngle > 360) mAngle -= 360;
-                    else if (mAngle < 0) mAngle += 360;
-
-                    // start animating
-                    ValueAnimator anim = ValueAnimator.ofFloat(mAngle, mAngle - diff);
-                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            moveHandleTo((float) animation.getAnimatedValue());
-                        }
-                    });
-                    anim.start();
+                    animateHandleTo(angle);
                 }
                 break;
         }
@@ -175,13 +157,54 @@ public class RingColorPicker extends ColorPicker {
         setMeasuredDimension(min, min);
     }
 
+    /**
+     * Moves handle to new angle
+     * @param angle new handle angle
+     */
     private void moveHandleTo(float angle) {
-        mAngle = angle;
+        mAngle = Utils.normalizeAngle(angle);
         int color = Utils.getColorFromAngle(mAngle);
 
+        // repaint
         mInnerPaint.setColor(color);
         mHandlePaint.setColor(color);
         invalidate();
+
+        // fire event
+        if (mOnColorChangedListener != null)
+            mOnColorChangedListener.colorChanged(color);
+    }
+
+    /**
+     * Animate handle to new angle
+     * @param angle new handle angle
+     */
+    private void animateHandleTo(float angle) {
+        float diff = mAngle - angle;
+
+        // correct angles
+        if (diff < -180) diff += 360;
+        else if (diff > 180) diff -= 360;
+
+        // start animating
+        ValueAnimator anim = ValueAnimator.ofFloat(mAngle, mAngle - diff);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                moveHandleTo((float) animation.getAnimatedValue());
+            }
+        });
+        anim.start();
+    }
+
+    /*
+    SETTERS/GETTERS
+     */
+
+    @Override
+    public void setColor(int color) {
+        float angle = Utils.getHueFromColor(color);
+        animateHandleTo(angle);
     }
 
     /**
@@ -197,6 +220,14 @@ public class RingColorPicker extends ColorPicker {
     }
 
     /**
+     * Get outer color ring width
+     * @return outer ring width in pixels
+     */
+    public int getRingWidth() {
+        return mRingWidth;
+    }
+
+    /**
      * Set gap width between outer ring and inner circle. Values are clamped
      * @param gapWidth gap width in pixels
      */
@@ -205,5 +236,13 @@ public class RingColorPicker extends ColorPicker {
 
         onSizeChanged(getWidth(), getHeight(), 0, 0);
         invalidate();
+    }
+
+    /**
+     * Get gap width between outer ring and inner circle.
+     * @return gap width in pixels
+     */
+    public int getGapWidth() {
+        return mGapWidth;
     }
 }

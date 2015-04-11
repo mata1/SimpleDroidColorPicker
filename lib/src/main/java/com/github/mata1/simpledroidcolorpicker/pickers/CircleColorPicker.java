@@ -43,9 +43,6 @@ public class CircleColorPicker extends ColorPicker {
     }
 
     @Override
-    protected void initAttributes(AttributeSet attrs) { }
-
-    @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
         super.onSizeChanged(w, h, oldW, oldH);
         mRadius = Math.min(mHalfWidth, mHalfHeight) - getMaxPadding() - HANDLE_RADIUS - mHandleStrokePaint.getStrokeWidth()/2;
@@ -87,28 +84,13 @@ public class CircleColorPicker extends ColorPicker {
                     mHandleY = (float)Math.sin(angle) * Math.min(centerDist, mRadius);
                     setHandleColor();
                 }
-
                 break;
 
             case MotionEvent.ACTION_UP:
-                if (mDragging) {
+                if (mDragging)
                     mDragging = false;
-                } else if (centerDist < mRadius) {
-                    // animate move if inside bounds
-                    PropertyValuesHolder xHolder = PropertyValuesHolder.ofFloat("x", mHandleX, x);
-                    PropertyValuesHolder yHolder = PropertyValuesHolder.ofFloat("y", mHandleY, y);
-
-                    ValueAnimator anim = ValueAnimator.ofPropertyValuesHolder(xHolder, yHolder);
-                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator val) {
-                            mHandleX = (float)val.getAnimatedValue("x");
-                            mHandleY = (float)val.getAnimatedValue("y");
-                            setHandleColor();
-                        }
-                    });
-                    anim.start();
-                }
+                else if (centerDist < mRadius) // animate move if inside bounds
+                    animateHandleTo(x, y);
                 break;
         }
     }
@@ -125,8 +107,43 @@ public class CircleColorPicker extends ColorPicker {
     private void setHandleColor() {
         float hue = Utils.getAngleDeg(0, 0, mHandleX, mHandleY);
         float sat = Utils.getDistance(0, 0, mHandleX, mHandleY) / mRadius;
+        int color = Utils.getColorFromAngle(hue, sat, 1);
 
-        mHandlePaint.setColor(Utils.getColorFromAngle(hue, sat, 1));
+        // repaint
+        mHandlePaint.setColor(color);
         invalidate();
+
+        // fire event
+        if (mOnColorChangedListener != null)
+            mOnColorChangedListener.colorChanged(color);
     }
- }
+
+    private void animateHandleTo(float x, float y) {
+        PropertyValuesHolder xHolder = PropertyValuesHolder.ofFloat("x", mHandleX, x);
+        PropertyValuesHolder yHolder = PropertyValuesHolder.ofFloat("y", mHandleY, y);
+
+        ValueAnimator anim = ValueAnimator.ofPropertyValuesHolder(xHolder, yHolder);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator val) {
+                mHandleX = (float)val.getAnimatedValue("x");
+                mHandleY = (float)val.getAnimatedValue("y");
+                setHandleColor();
+            }
+        });
+        anim.start();
+    }
+
+    /*
+    SETTERS/GETTERS
+     */
+
+    @Override
+    public void setColor(int color) {
+        float hue = Utils.getHueFromColor(color);
+        float sat = Utils.getSaturationFromColor(color);
+        float x = (float)Math.cos(Math.toRadians(hue)) * sat * mRadius;
+        float y = (float)Math.sin(Math.toRadians(hue)) * sat * mRadius;
+        animateHandleTo(x, y);
+    }
+}

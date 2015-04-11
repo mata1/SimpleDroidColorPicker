@@ -43,9 +43,6 @@ public class LinearColorPicker extends ColorPicker {
     }
 
     @Override
-    protected void initAttributes(AttributeSet attrs) { }
-
-    @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
         mRect.set(
                 getPaddingLeft() + HANDLE_WIDTH/2, // left
@@ -86,26 +83,16 @@ public class LinearColorPicker extends ColorPicker {
 
             case MotionEvent.ACTION_MOVE:
                 // check if handle grabbed and inside bounds
-                if (mDragging) {
+                if (mDragging)
                     moveHandleTo(x);
-                }
                 break;
 
             case MotionEvent.ACTION_UP:
-                // release handle or move handle
-                if (mDragging) {
+                // release handle or animate handle
+                if (mDragging)
                     mDragging = false;
-                } else if (mRect.contains(x, y)) {
-                    // start animating
-                    ValueAnimator anim = ValueAnimator.ofFloat(mHandleRect.centerX(), x);
-                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            moveHandleTo((float) animation.getAnimatedValue());
-                        }
-                    });
-                    anim.start();
-                }
+                else if (mRect.contains(x, y))
+                    animateHandleTo(x);
                 break;
         }
     }
@@ -119,9 +106,41 @@ public class LinearColorPicker extends ColorPicker {
         // move
         x = Utils.clamp(x, mRect.left, mRect.right);
         mHandleRect.offsetTo(x - mHandleRect.width()/2, mHandleRect.top);
+
         // repaint
         float fraction = (x - mRect.left) / mRect.width();
-        mHandlePaint.setColor(Utils.getColorFromFraction(fraction));
+        int color = Utils.getColorFromFraction(fraction);
+        mHandlePaint.setColor(color);
         invalidate();
+
+        // fire event
+        if (mOnColorChangedListener != null)
+            mOnColorChangedListener.colorChanged(color);
+    }
+
+    /**
+     * Animate handle to new position
+     * @param x new handle position
+     */
+    private void animateHandleTo(float x) {
+        ValueAnimator anim = ValueAnimator.ofFloat(mHandleRect.centerX(), x);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                moveHandleTo((float) animation.getAnimatedValue());
+            }
+        });
+        anim.start();
+    }
+
+    /*
+    SETTERS/GETTERS
+     */
+
+    @Override
+    public void setColor(int color) {
+        float fraction = Utils.getFractionFromColor(color);
+        float newX = fraction * mRect.width() + mRect.left;
+        animateHandleTo(newX);
     }
 }

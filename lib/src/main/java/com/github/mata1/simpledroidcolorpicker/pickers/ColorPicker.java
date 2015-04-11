@@ -1,6 +1,7 @@
 package com.github.mata1.simpledroidcolorpicker.pickers;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.github.mata1.simpledroidcolorpicker.R;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorChangedListener;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
 
@@ -20,6 +22,7 @@ public abstract class ColorPicker extends View {
 
     protected Paint mColorPaint;
     protected Paint mHandlePaint, mHandleStrokePaint;
+    private int mHandleStrokeColor;
 
     protected float mHalfWidth, mHalfHeight;
 
@@ -45,10 +48,18 @@ public abstract class ColorPicker extends View {
 
         mHandleStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mHandleStrokePaint.setStyle(Paint.Style.STROKE);
-        mHandleStrokePaint.setColor(Color.WHITE);
+        mHandleStrokePaint.setColor(mHandleStrokeColor);
         mHandleStrokePaint.setStrokeWidth(4);
     }
-    protected abstract void initAttributes(AttributeSet attrs);
+    protected void initAttributes(AttributeSet attrs) {
+        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ColorPicker);
+
+        try {
+            mHandleStrokeColor = a.getColor(R.styleable.ColorPicker_handleStrokeColor, Color.WHITE);
+        } finally {
+            a.recycle();
+        }
+    }
 
     @Override
     protected abstract void onDraw(Canvas canvas);
@@ -74,11 +85,47 @@ public abstract class ColorPicker extends View {
     protected abstract void handleTouch(int motionAction, float x, float y);
 
     /**
+     * Get view maximum padding
+     * @return maximum padding
+     */
+    protected int getMaxPadding() {
+        return Math.max(Math.max(getPaddingLeft(), getPaddingRight()), Math.max(getPaddingTop(), getPaddingBottom()));
+    }
+
+    /*
+    SETTERS/GETTERS
+     */
+
+    /**
+     * Set new picker color
+     * @param color new picker color
+     */
+    public abstract void setColor(int color);
+
+    /**
      * Get current picker color
      * @return current color
      */
     public int getColor() {
         return mHandlePaint.getColor();
+    }
+
+    /**
+     * Set handle stroke color
+     * @param color new handle stroke color
+     */
+    public void setHandleStrokeColor(int color) {
+        mHandleStrokeColor = color;
+        mHandleStrokePaint.setColor(mHandleStrokeColor);
+        invalidate();
+    }
+
+    /**
+     * Get handle stroke color
+     * @return current handle stroke color
+     */
+    public int getHandleStrokeColor() {
+        return mHandleStrokeColor;
     }
 
     /**
@@ -99,11 +146,5 @@ public abstract class ColorPicker extends View {
         mOnColorChangedListener = eventListener;
     }
 
-    /**
-     * Get view maximum padding
-     * @return maximum padding
-     */
-    protected int getMaxPadding() {
-        return Math.max(Math.max(getPaddingLeft(), getPaddingRight()), Math.max(getPaddingTop(), getPaddingBottom()));
-    }
+
 }

@@ -39,6 +39,32 @@ public class Utils {
     }
 
     /**
+     * Get fraction of hue from color
+     * @param color color
+     * @return hue/360, 0..1
+     */
+    public static float getFractionFromColor(int color) {
+        return getHueFromColor(color)/360;
+    }
+
+    /**
+     * Get hue from color
+     * @param color color
+     * @return color hue value, 0..360
+     */
+    public static float getHueFromColor(int color) {
+        float hsv[] = new float[3];
+        Color.colorToHSV(color, hsv);
+        return hsv[0];
+    }
+
+    public static float getSaturationFromColor(int color) {
+        float hsv[] = new float[3];
+        Color.colorToHSV(color, hsv);
+        return hsv[1];
+    }
+
+    /**
      * Get hue ring color array
      * @param n number of colors in array
      * @return hue color array
@@ -74,6 +100,17 @@ public class Utils {
      */
     public static float getAngleDeg(float x1, float y1, float x2, float y2) {
         return (float)Math.toDegrees(getAngle(x1, y1, x2, y2));
+    }
+
+    /**
+     * Normalize angle in degrees to value between 0 and 360
+     * @param deg angle in degrees
+     * @return normalized angle in degrees
+     */
+    public static float normalizeAngle(float deg) {
+        if (deg > 360) deg -= 360;
+        else if (deg < 0) deg += 360;
+        return deg;
     }
 
     /**

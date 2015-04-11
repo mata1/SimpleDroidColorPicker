@@ -8,7 +8,8 @@
     android:orientation="vertical">
 
     <com.github.mata1.simpledroidcolorpicker.pickers.CircleColorPicker
-        android:visibility="gone"
+        android:id="@+id/ccp"
+        android:visibility="visible"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="200dp"
@@ -16,14 +17,15 @@
         android:padding="10dp" />
 
     <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
+        android:id="@+id/lcp"
         android:visibility="visible"
         android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="70dp" />
 
     <com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker
-        android:id="@+id/cr"
-        android:visibility="visible"
+        android:id="@+id/rcp"
+        android:visibility="gone"
         android:padding="10dp"
         android:background="#00aaffdd"
         android:layout_width="match_parent"
@@ -49,6 +51,12 @@
         android:visibility="gone"
         android:progress="5"
         android:max="20"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:onClick="randomColor"
+        android:text="Set random color"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
