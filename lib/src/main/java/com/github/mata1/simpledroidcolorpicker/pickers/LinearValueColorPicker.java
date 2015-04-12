@@ -14,7 +14,7 @@ import com.github.mata1.simpledroidcolorpicker.utils.Utils;
  */
 public class LinearValueColorPicker extends LinearColorPicker {
 
-    private float[] mHSV;
+    private float[] mHSV = new float[] { 0, 1, 1 };
 
     public LinearValueColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -38,6 +38,7 @@ public class LinearValueColorPicker extends LinearColorPicker {
 
         // repaint
         float fraction = (x - mRect.left) / mRect.width();
+        fraction = Math.max(fraction, 0.01f); // prevent zero value
         mHSV[2] = fraction; // value
         int color = ColorUtils.getColorFromHSV(mHSV[0], mHSV[1], mHSV[2]);
         mHandlePaint.setColor(color);
@@ -48,19 +49,18 @@ public class LinearValueColorPicker extends LinearColorPicker {
             mOnColorChangedListener.colorChanged(color);
     }
 
-    @Override
-    public void setColor(int color) {
-        //super.setColor(color);
-
-        float[] HSV = new float[3];
-        Color.colorToHSV(color, HSV);
-        mHSV = HSV;
-        mHSV[2] = 1; // ignore color value
+    public void setHueSat(float hue, float sat) {
+        mHSV[0] = hue;
+        mHSV[1] = sat;
         Shader sh = new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
-                        Color.BLACK, Color.HSVToColor(mHSV), Shader.TileMode.CLAMP);
+                Color.BLACK, ColorUtils.getColorFromHSV(hue, sat, 1), Shader.TileMode.CLAMP);
 
         mColorPaint.setShader(sh);
-        mHandlePaint.setColor(color);
+        mHandlePaint.setColor(ColorUtils.getColorFromHSV(hue, sat, getValue()));
         invalidate();
+    }
+
+    private float getValue() {
+        return (mHandleRect.centerX() - mRect.left) / mRect.width();
     }
 }

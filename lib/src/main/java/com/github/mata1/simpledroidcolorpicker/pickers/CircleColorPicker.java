@@ -9,6 +9,7 @@ import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorChangedListener;
@@ -114,6 +115,7 @@ public class CircleColorPicker extends CircleHandleColorPicker {
         float sat = Utils.getDistance(0, 0, mHandleX, mHandleY) / mRadius;
         float val = (255 - mValuePaint.getAlpha())/255f;
         int color = ColorUtils.getColorFromHSV(hue, sat, val);
+        Log.d("color", color+", " + hue + " " + sat + " " + val);
 
         // repaint
         mHandlePaint.setColor(color);
@@ -123,7 +125,8 @@ public class CircleColorPicker extends CircleHandleColorPicker {
         if (mOnColorChangedListener != null)
             mOnColorChangedListener.colorChanged(color);
         if (mValLCP != null)
-            mValLCP.setColor(color);
+            mValLCP.setHueSat(hue, sat);
+            //mValLCP.setColor(color);
     }
 
     /**
@@ -163,6 +166,7 @@ public class CircleColorPicker extends CircleHandleColorPicker {
 
     public void setLinearValueColorPicker(LinearValueColorPicker lcp) {
         mValLCP = lcp;
+        mValLCP.setColor(getColor());
         mValLCP.setOnColorChangedListener(new OnColorChangedListener() {
             @Override
             public void colorChanged(int color) {
@@ -172,5 +176,6 @@ public class CircleColorPicker extends CircleHandleColorPicker {
                 invalidate();
             }
         });
+
     }
 }
