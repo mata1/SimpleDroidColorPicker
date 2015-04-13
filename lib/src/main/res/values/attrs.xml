@@ -2,6 +2,9 @@
 <resources>
     <declare-styleable name="ColorPicker">
         <attr name="handleStrokeColor" format="color"/>
+        <attr name="hue" format="float"/>
+        <attr name="saturation" format="float"/>
+        <attr name="value" format="float"/>
     </declare-styleable>
 
     <declare-styleable name="RingColorPicker">

@@ -97,4 +97,13 @@ public class ColorUtils {
 
         return c;
     }
+
+    public static int[] getHueRingColors(int n, float saturation, float value) {
+        int[] c = new int[n];
+
+        for (int i = 0; i < n; i++)
+            c[i] = getColorFromHSV(i / (n - 1f) * 360f, saturation, value);
+
+        return c;
+    }
 }

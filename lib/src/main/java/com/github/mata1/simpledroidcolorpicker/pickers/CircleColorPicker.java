@@ -4,7 +4,6 @@ import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
@@ -42,14 +41,17 @@ public class CircleColorPicker extends CircleHandleColorPicker {
         mColorPaint.setShader(new SweepGradient(0, 0, COLORS, null));
         mSaturationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mValuePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mValuePaint.setAlpha(0);
-        mHandlePaint.setColor(Color.WHITE);
+        mValuePaint.setAlpha((int)((1 - mVal) * 255));
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
         super.onSizeChanged(w, h, oldW, oldH);
         mRadius = Math.min(mHalfWidth, mHalfHeight) - getMaxPadding() - HANDLE_RADIUS - mHandleStrokePaint.getStrokeWidth()/2;
+
+        // position circle based on HSV values
+        mHandleX = (float)Math.cos(Math.toRadians(mHue)) * mSat * mRadius;
+        mHandleY = (float)Math.sin(Math.toRadians(mHue)) * mSat * mRadius;
 
         // set paint radial shader
         RadialGradient radialGradient = new RadialGradient(0, 0, mRadius, 0xFFFFFFFF, 0x00FFFFFF, Shader.TileMode.CLAMP);
@@ -111,11 +113,9 @@ public class CircleColorPicker extends CircleHandleColorPicker {
      */
     @Override
     protected void moveHandleTo() {
-        float hue = Utils.getAngleDeg(0, 0, mHandleX, mHandleY);
-        float sat = Utils.getDistance(0, 0, mHandleX, mHandleY) / mRadius;
-        float val = (255 - mValuePaint.getAlpha())/255f;
-        int color = ColorUtils.getColorFromHSV(hue, sat, val);
-        //Log.d("color", color+", " + hue + " " + sat + " " + val);
+        mHue = Utils.getAngleDeg(0, 0, mHandleX, mHandleY);
+        mSat = Utils.getDistance(0, 0, mHandleX, mHandleY) / mRadius;
+        int color = ColorUtils.getColorFromHSV(mHue, mSat, mVal);
 
         // repaint
         mHandlePaint.setColor(color);
@@ -125,7 +125,7 @@ public class CircleColorPicker extends CircleHandleColorPicker {
         if (mOnColorChangedListener != null)
             mOnColorChangedListener.colorChanged(color);
         if (mValLCP != null)
-            mValLCP.setHSV(hue, sat, val);
+            mValLCP.setHSV(mHue, mSat, mVal);
     }
 
     /**
@@ -166,12 +166,12 @@ public class CircleColorPicker extends CircleHandleColorPicker {
     public void setLinearColorPicker(LinearColorPicker lcp) {
         mValLCP = lcp;
         if (mValLCP != null) {
-            mValLCP.setHSV(0,0,1);
+            mValLCP.setHSV(mHue, mSat, mVal);
             mValLCP.setOnColorChangedListener(new OnColorChangedListener() {
                 @Override
                 public void colorChanged(int color) {
-                    float value = ColorUtils.getValueFromColor(color);
-                    mValuePaint.setAlpha((int) ((1 - value) * 255));
+                    mVal = ColorUtils.getValueFromColor(color);
+                    mValuePaint.setAlpha((int) ((1 - mVal) * 255));
                     mHandlePaint.setColor(color);
                     invalidate();
                 }

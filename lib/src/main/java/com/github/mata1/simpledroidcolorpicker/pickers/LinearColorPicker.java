@@ -24,8 +24,6 @@ public class LinearColorPicker extends RectHandleColorPicker {
 
     private PickerType mPickerType;
 
-    private float mHue, mSat, mVal; // HSV values
-
     protected RectF mRect;
 
     private static final int RECT_EDGE_RADIUS = 10;
@@ -57,10 +55,6 @@ public class LinearColorPicker extends RectHandleColorPicker {
     protected void init() {
         super.init();
 
-        mHandlePaint.setColor(COLORS[0]);
-
-        mSat = mVal = 1;
-
         mRect = new RectF();
     }
 
@@ -81,8 +75,8 @@ public class LinearColorPicker extends RectHandleColorPicker {
                 h - getPaddingBottom() - s // bottom
         );
 
-        if (mPickerType == PickerType.SATURATION || mPickerType == PickerType.VALUE)
-            mHandleRect.offsetTo(mRect.right - mHandleRect.width()/2, mHandleRect.top);
+        // set handle to correct position
+        mHandleRect.offsetTo(getNewX() - mHandleRect.width()/2, mHandleRect.top);
 
         mColorPaint.setShader(createGradient());
     }
@@ -171,6 +165,22 @@ public class LinearColorPicker extends RectHandleColorPicker {
         anim.start();
     }
 
+    private float getNewX() {
+        float fraction = 0;
+        switch (mPickerType) {
+            case HUE:
+                fraction = mHue / 360;
+                break;
+            case SATURATION:
+                fraction = mSat;
+                break;
+            case VALUE:
+                fraction = mVal;
+                break;
+        }
+        return fraction * mRect.width() + mRect.left;
+    }
+
     /*
     SETTERS/GETTERS
      */
@@ -207,7 +217,7 @@ public class LinearColorPicker extends RectHandleColorPicker {
         switch (mPickerType) {
             case HUE:
                 return new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
-                        COLORS, null, LinearGradient.TileMode.CLAMP);
+                        ColorUtils.getHueRingColors(7, mSat, mVal), null, LinearGradient.TileMode.CLAMP);
             case SATURATION:
                 return new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
                         ColorUtils.getColorFromHSV(mHue, 0, mVal), ColorUtils.getColorFromHSV(mHue, 1, mVal), Shader.TileMode.CLAMP);

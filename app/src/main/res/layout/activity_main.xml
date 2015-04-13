@@ -8,6 +8,10 @@
     android:orientation="vertical">
 
     <com.github.mata1.simpledroidcolorpicker.pickers.CircleColorPicker
+        custom:hue="120"
+        custom:saturation="0.5"
+        custom:value="0.8"
+
         android:id="@+id/ccp"
         android:visibility="visible"
         android:layout_weight="1"
@@ -17,6 +21,10 @@
         android:padding="10dp" />
 
     <com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker
+        custom:hue="120"
+        custom:saturation="0.5"
+        custom:value="0.8"
+
         android:id="@+id/rcp"
         android:visibility="gone"
         android:padding="10dp"
@@ -27,6 +35,10 @@
         android:layout_height="200dp" />
 
     <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
+        custom:hue="120"
+        custom:saturation="0.5"
+        custom:value="0.8"
+
         android:id="@+id/lcp"
         android:visibility="visible"
         android:padding="10dp"
@@ -34,6 +46,10 @@
         android:layout_height="60dp" />
 
     <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
+        custom:hue="120"
+        custom:saturation="0.5"
+        custom:value="0.8"
+
         custom:pickerType="saturation"
         android:id="@+id/lcp_sat"
         android:visibility="visible"
