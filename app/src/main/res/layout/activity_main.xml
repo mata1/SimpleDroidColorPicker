@@ -28,22 +28,25 @@
 
     <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
         android:id="@+id/lcp"
-        android:visibility="gone"
+        android:visibility="visible"
         android:padding="10dp"
         android:layout_width="match_parent"
-        android:layout_height="70dp" />
+        android:layout_height="60dp" />
 
     <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
+        custom:pickerType="saturation"
         android:id="@+id/lcp_sat"
-        android:visibility="gone"
+        android:visibility="visible"
         android:padding="10dp"
         android:layout_width="match_parent"
-        android:layout_height="70dp" />
+        android:layout_height="60dp" />
 
-    <com.github.mata1.simpledroidcolorpicker.pickers.LinearValueColorPicker
+    <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
+        custom:pickerType="value"
         android:id="@+id/lcp_val"
+        android:padding="10dp"
         android:layout_width="match_parent"
-        android:layout_height="40dp" />
+        android:layout_height="60dp" />
 
     <SeekBar
         android:id="@+id/sb_ring"

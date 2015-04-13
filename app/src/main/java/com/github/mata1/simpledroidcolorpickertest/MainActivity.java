@@ -8,11 +8,9 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorChangedListener;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
 import com.github.mata1.simpledroidcolorpicker.pickers.CircleColorPicker;
 import com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker;
-import com.github.mata1.simpledroidcolorpicker.pickers.LinearValueColorPicker;
 import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
 import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 
@@ -27,8 +25,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     private SeekBar sbRing, sbGap, sbStroke;
     private RingColorPicker rcp;
     private CircleColorPicker ccp;
-    private LinearColorPicker lcp, lcp_sat;
-    private LinearValueColorPicker lcp_val;
+    private LinearColorPicker lcp, lcp_sat, lcp_val;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +35,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         // linear color pickers
         lcp = (LinearColorPicker)findViewById(R.id.lcp);
         lcp_sat = (LinearColorPicker)findViewById(R.id.lcp_sat);
-        lcp_val = (LinearValueColorPicker)findViewById(R.id.lcp_val);
+        lcp_val = (LinearColorPicker)findViewById(R.id.lcp_val);
 
         // ring color picker
         rcp = (RingColorPicker)findViewById(R.id.rcp);
@@ -51,7 +48,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
         // circle color picker
         ccp = (CircleColorPicker)findViewById(R.id.ccp);
-        ccp.setLinearValueColorPicker(lcp_val);
+        ccp.setLinearColorPicker(lcp_val);
 
         // seekbars
         sbRing = (SeekBar)findViewById(R.id.sb_ring);
