@@ -181,6 +181,21 @@ public class LinearColorPicker extends RectHandleColorPicker {
         return fraction * mRect.width() + mRect.left;
     }
 
+    private Shader createGradient() {
+        switch (mPickerType) {
+            case HUE:
+                return new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
+                        ColorUtils.getHueRingColors(7, mSat, mVal), null, LinearGradient.TileMode.CLAMP);
+            case SATURATION:
+                return new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
+                        ColorUtils.getColorFromHSV(mHue, 0, mVal), ColorUtils.getColorFromHSV(mHue, 1, mVal), Shader.TileMode.CLAMP);
+            case VALUE:
+                return new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
+                        Color.BLACK, ColorUtils.getColorFromHSV(mHue, mSat, 1), Shader.TileMode.CLAMP);
+        }
+        return null;
+    }
+
     /*
     SETTERS/GETTERS
      */
@@ -213,18 +228,4 @@ public class LinearColorPicker extends RectHandleColorPicker {
         invalidate();
     }
 
-    private Shader createGradient() {
-        switch (mPickerType) {
-            case HUE:
-                return new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
-                        ColorUtils.getHueRingColors(7, mSat, mVal), null, LinearGradient.TileMode.CLAMP);
-            case SATURATION:
-                return new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
-                        ColorUtils.getColorFromHSV(mHue, 0, mVal), ColorUtils.getColorFromHSV(mHue, 1, mVal), Shader.TileMode.CLAMP);
-            case VALUE:
-                return new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
-                        Color.BLACK, ColorUtils.getColorFromHSV(mHue, mSat, 1), Shader.TileMode.CLAMP);
-        }
-        return null;
-    }
 }

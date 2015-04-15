@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
-import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
@@ -20,9 +19,8 @@ import java.io.FileOutputStream;
 import java.util.Random;
 
 
-public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeListener{
+public class MainActivity extends Activity {
 
-    private SeekBar sbRing, sbGap, sbStroke;
     private RingColorPicker rcp;
     private CircleColorPicker ccp;
     private LinearColorPicker lcp, lcp_sat, lcp_val;
@@ -51,35 +49,6 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
         // circle color picker
         ccp = (CircleColorPicker)findViewById(R.id.ccp);
         //ccp.setValueLinearColorPicker(lcp_val);
-
-        // seekbars
-        sbRing = (SeekBar)findViewById(R.id.sb_ring);
-        sbRing.setOnSeekBarChangeListener(this);
-        sbGap = (SeekBar)findViewById(R.id.sb_gap);
-        sbGap.setOnSeekBarChangeListener(this);
-        sbStroke = (SeekBar)findViewById(R.id.sb_stroke);
-        sbStroke.setOnSeekBarChangeListener(this);
-    }
-
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (seekBar.equals(sbRing)) {
-            rcp.setRingWidth(progress);
-        } else if (seekBar.equals(sbGap)) {
-            rcp.setGapWidth(progress);
-        } else if (seekBar.equals(sbStroke)) {
-
-        }
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
     }
 
     public void randomColor(View v) {
