@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 
 import com.github.mata1.simpledroidcolorpicker.R;
+import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorChangedListener;
 import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 
@@ -21,10 +22,11 @@ public class RingColorPicker extends RectHandleColorPicker {
 
     private Paint mInnerPaint;
 
+    private LinearColorPicker mValLCP, mSatLCP;
+
     private int mRingWidth, mGapWidth; // view attributes
     private float mInnerRadius, mOuterRadius; // view measurements
 
-    private float mAngle; // current selection angle
 
     public RingColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -43,12 +45,10 @@ public class RingColorPicker extends RectHandleColorPicker {
         // init paints
         mColorPaint.setStyle(Paint.Style.STROKE);
         mColorPaint.setStrokeWidth(mRingWidth);
-        mColorPaint.setShader(new SweepGradient(0, 0, COLORS, null));
+        mColorPaint.setShader(new SweepGradient(0, 0, ColorUtils.getHueRingColors(7, mSat, mVal), null));
 
         mInnerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mInnerPaint.setColor(COLORS[0]);
-
-        mHandlePaint.setColor(COLORS[0]);
+        mInnerPaint.setColor(getColor());
     }
 
     /**
@@ -93,7 +93,7 @@ public class RingColorPicker extends RectHandleColorPicker {
         canvas.drawCircle(0, 0, mInnerRadius, mInnerPaint);
 
         // rotate handle
-        canvas.rotate(mAngle);
+        canvas.rotate(mHue);
         canvas.drawRoundRect(mHandleRect, HANDLE_EDGE_RADIUS, HANDLE_EDGE_RADIUS, mHandlePaint);
         canvas.drawRoundRect(mHandleRect, HANDLE_EDGE_RADIUS, HANDLE_EDGE_RADIUS, mHandleStrokePaint);
     }
@@ -115,7 +115,7 @@ public class RingColorPicker extends RectHandleColorPicker {
         switch (motionAction) {
             case MotionEvent.ACTION_DOWN:
                 // check if touching handle
-                float absDiff = Math.abs(angle - mAngle);
+                float absDiff = Math.abs(angle - mHue);
                 mDragging = absDiff < HANDLE_TOUCH_LIMIT && isTouchingRing;
                 break;
 
@@ -131,7 +131,7 @@ public class RingColorPicker extends RectHandleColorPicker {
                     mDragging = false;
                 } else if (mOnColorPickedListener != null && isTouchingCenter) {
                     // fire event if touching center
-                    mOnColorPickedListener.colorPicked(ColorUtils.getColorFromHue(mAngle));
+                    mOnColorPickedListener.colorPicked(ColorUtils.getColorFromHue(mHue));
                     playSoundEffect(SoundEffectConstants.CLICK);
                 } else if (isTouchingRing) {
                     animateHandleTo(angle);
@@ -152,8 +152,8 @@ public class RingColorPicker extends RectHandleColorPicker {
      */
     @Override
     protected void moveHandleTo(float angle) {
-        mAngle = Utils.normalizeAngle(angle);
-        int color = ColorUtils.getColorFromHue(mAngle);
+        mHue = Utils.normalizeAngle(angle);
+        int color = ColorUtils.getColorFromHSV(mHue, mSat, mVal);
 
         // repaint
         mInnerPaint.setColor(color);
@@ -163,6 +163,12 @@ public class RingColorPicker extends RectHandleColorPicker {
         // fire event
         if (mOnColorChangedListener != null)
             mOnColorChangedListener.colorChanged(color);
+
+        // set linear pickers if attached
+        if (mSatLCP != null)
+            mSatLCP.setHSV(mHue, mSat, mVal);
+        if (mValLCP != null)
+            mValLCP.setHSV(mHue, mSat, mVal);
     }
 
     /**
@@ -171,14 +177,14 @@ public class RingColorPicker extends RectHandleColorPicker {
      */
     @Override
     protected void animateHandleTo(float angle) {
-        float diff = mAngle - angle;
+        float diff = mHue - angle;
 
         // correct angles
         if (diff < -180) diff += 360;
         else if (diff > 180) diff -= 360;
 
         // start animating
-        ValueAnimator anim = ValueAnimator.ofFloat(mAngle, mAngle - diff);
+        ValueAnimator anim = ValueAnimator.ofFloat(mHue, mHue - diff);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -235,5 +241,41 @@ public class RingColorPicker extends RectHandleColorPicker {
      */
     public int getGapWidth() {
         return mGapWidth;
+    }
+
+    public void setSaturationLinearColorPicker(LinearColorPicker lcp) {
+        mSatLCP = lcp;
+        if (mSatLCP != null) {
+            mSatLCP.setHSV(mHue, mSat, mVal);
+            mSatLCP.setOnColorChangedListener(new OnColorChangedListener() {
+                @Override
+                public void colorChanged(int color) {
+                    mSat = ColorUtils.getSaturationFromColor(color);
+                    mColorPaint.setShader(new SweepGradient(0, 0, ColorUtils.getHueRingColors(7, mSat, mVal), null));
+                    mHandlePaint.setColor(color);
+                    if (mValLCP != null)
+                        mValLCP.setHSV(mHue, mSat, mVal);
+                    invalidate();
+                }
+            });
+        }
+    }
+
+    public void setValueLinearColorPicker(LinearColorPicker lcp) {
+        mValLCP = lcp;
+        if (mValLCP != null) {
+            mValLCP.setHSV(mHue, mSat, mVal);
+            mValLCP.setOnColorChangedListener(new OnColorChangedListener() {
+                @Override
+                public void colorChanged(int color) {
+                    mVal = ColorUtils.getValueFromColor(color);
+                    mColorPaint.setShader(new SweepGradient(0, 0, ColorUtils.getHueRingColors(7, mSat, mVal), null));
+                    mHandlePaint.setColor(color);
+                    if (mSatLCP != null)
+                        mSatLCP.setHSV(mHue, mSat, mVal);
+                    invalidate();
+                }
+            });
+        }
     }
 }

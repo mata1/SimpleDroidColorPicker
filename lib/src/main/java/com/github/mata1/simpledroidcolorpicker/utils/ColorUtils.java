@@ -78,7 +78,7 @@ public class ColorUtils {
      * @param color color
      * @return HSV array, length = 3
      */
-    private static float[] getHSVFromColor(int color) {
+    public static float[] getHSVFromColor(int color) {
         float hsv[] = new float[3];
         Color.colorToHSV(color, hsv);
         return hsv;
@@ -94,6 +94,15 @@ public class ColorUtils {
 
         for (int i = 0; i < n; i++)
             c[i] = Color.HSVToColor(new float[]{(float)i / n * 360, 1, 1});
+
+        return c;
+    }
+
+    public static int[] getHueRingColors(int n, float saturation, float value) {
+        int[] c = new int[n];
+
+        for (int i = 0; i < n; i++)
+            c[i] = getColorFromHSV(i / (n - 1f) * 360f, saturation, value);
 
         return c;
     }

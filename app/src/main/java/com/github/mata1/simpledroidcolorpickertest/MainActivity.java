@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
-import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
@@ -20,55 +19,36 @@ import java.io.FileOutputStream;
 import java.util.Random;
 
 
-public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeListener{
+public class MainActivity extends Activity {
 
-    private SeekBar sbRing, sbGap, sbStroke;
     private RingColorPicker rcp;
     private CircleColorPicker ccp;
-    private LinearColorPicker lcp;
+    private LinearColorPicker lcp, lcp_sat, lcp_val;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // linear color pickers
+        lcp = (LinearColorPicker)findViewById(R.id.lcp);
+        lcp_sat = (LinearColorPicker)findViewById(R.id.lcp_sat);
+        lcp_val = (LinearColorPicker)findViewById(R.id.lcp_val);
+
+        // ring color picker
         rcp = (RingColorPicker)findViewById(R.id.rcp);
+        rcp.setSaturationLinearColorPicker(lcp_sat);
+        rcp.setValueLinearColorPicker(lcp_val);
         rcp.setOnColorPickedListener(new OnColorPickedListener() {
             @Override
             public void colorPicked(int color) {
                 Toast.makeText(getApplicationContext(), "Color selected: " + color, Toast.LENGTH_SHORT).show();
             }
         });
+
+        // circle color picker
         ccp = (CircleColorPicker)findViewById(R.id.ccp);
-        lcp = (LinearColorPicker)findViewById(R.id.lcp);
-
-        sbRing = (SeekBar)findViewById(R.id.sb_ring);
-        sbRing.setOnSeekBarChangeListener(this);
-        sbGap = (SeekBar)findViewById(R.id.sb_gap);
-        sbGap.setOnSeekBarChangeListener(this);
-        sbStroke = (SeekBar)findViewById(R.id.sb_stroke);
-        sbStroke.setOnSeekBarChangeListener(this);
-    }
-
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (seekBar.equals(sbRing)) {
-            rcp.setRingWidth(progress);
-        } else if (seekBar.equals(sbGap)) {
-            rcp.setGapWidth(progress);
-        } else if (seekBar.equals(sbStroke)) {
-
-        }
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
+        //ccp.setValueLinearColorPicker(lcp_val);
     }
 
     public void randomColor(View v) {

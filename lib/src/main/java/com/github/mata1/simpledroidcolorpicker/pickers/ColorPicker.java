@@ -12,6 +12,8 @@ import android.view.View;
 import com.github.mata1.simpledroidcolorpicker.R;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorChangedListener;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
+import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
+import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 
 /**
  * Color picker abstraction class
@@ -23,6 +25,8 @@ public abstract class ColorPicker extends View {
     protected Paint mColorPaint;
     protected Paint mHandlePaint, mHandleStrokePaint;
     private int mHandleStrokeColor;
+
+    protected float mHue, mSat, mVal; // HSV color values
 
     protected float mHalfWidth, mHalfHeight;
 
@@ -44,18 +48,22 @@ public abstract class ColorPicker extends View {
         mColorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         mHandlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mHandlePaint.setColor(Color.WHITE);
+        mHandlePaint.setColor(ColorUtils.getColorFromHSV(mHue, mSat, mVal));
 
         mHandleStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mHandleStrokePaint.setStyle(Paint.Style.STROKE);
         mHandleStrokePaint.setColor(mHandleStrokeColor);
         mHandleStrokePaint.setStrokeWidth(4);
     }
+
     protected void initAttributes(AttributeSet attrs) {
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ColorPicker);
 
         try {
             mHandleStrokeColor = a.getColor(R.styleable.ColorPicker_handleStrokeColor, Color.WHITE);
+            mHue = Utils.normalizeAngle(a.getFloat(R.styleable.ColorPicker_hue, 0));
+            mSat = Utils.clamp(a.getFloat(R.styleable.ColorPicker_saturation, 1), 0, 1);
+            mVal = Utils.clamp(a.getFloat(R.styleable.ColorPicker_value, 1), 0, 1);
         } finally {
             a.recycle();
         }

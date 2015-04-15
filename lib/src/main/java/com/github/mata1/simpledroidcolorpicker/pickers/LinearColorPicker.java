@@ -2,13 +2,16 @@ package com.github.mata1.simpledroidcolorpicker.pickers;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import com.github.mata1.simpledroidcolorpicker.R;
 import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 
@@ -17,7 +20,11 @@ import com.github.mata1.simpledroidcolorpicker.utils.Utils;
  */
 public class LinearColorPicker extends RectHandleColorPicker {
 
-    private RectF mRect;
+    public enum PickerType { HUE, SATURATION, VALUE }
+
+    private PickerType mPickerType;
+
+    protected RectF mRect;
 
     private static final int RECT_EDGE_RADIUS = 10;
 
@@ -30,10 +37,23 @@ public class LinearColorPicker extends RectHandleColorPicker {
     }
 
     @Override
+    protected void initAttributes(AttributeSet attrs) {
+        super.initAttributes(attrs);
+
+        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.LinearColorPicker);
+
+        try {
+            int ordinal = a.getInt(R.styleable.LinearColorPicker_pickerType, PickerType.HUE.ordinal());
+            if (ordinal >= 0 && ordinal < PickerType.values().length)
+                mPickerType = PickerType.values()[ordinal];
+        } finally {
+            a.recycle();
+        }
+    }
+
+    @Override
     protected void init() {
         super.init();
-
-        mHandlePaint.setColor(COLORS[0]);
 
         mRect = new RectF();
     }
@@ -55,8 +75,10 @@ public class LinearColorPicker extends RectHandleColorPicker {
                 h - getPaddingBottom() - s // bottom
         );
 
-        Shader sweep = new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(), COLORS, null, LinearGradient.TileMode.CLAMP);
-        mColorPaint.setShader(sweep);
+        // set handle to correct position
+        mHandleRect.offsetTo(getNewX() - mHandleRect.width()/2, mHandleRect.top);
+
+        mColorPaint.setShader(createGradient());
     }
 
     @Override
@@ -106,7 +128,19 @@ public class LinearColorPicker extends RectHandleColorPicker {
 
         // repaint
         float fraction = (x - mRect.left) / mRect.width();
-        int color = ColorUtils.getColorFromFraction(fraction);
+        fraction = Math.max(fraction, 0.01f); // prevent zero value
+        switch (mPickerType) {
+            case HUE:
+                mHue = fraction * 360;
+                break;
+            case SATURATION:
+                mSat = fraction;
+                break;
+            case VALUE:
+                mVal = fraction;
+                break;
+        }
+        int color = ColorUtils.getColorFromHSV(mHue, mSat, mVal);
         mHandlePaint.setColor(color);
         invalidate();
 
@@ -131,14 +165,67 @@ public class LinearColorPicker extends RectHandleColorPicker {
         anim.start();
     }
 
+    private float getNewX() {
+        float fraction = 0;
+        switch (mPickerType) {
+            case HUE:
+                fraction = mHue / 360;
+                break;
+            case SATURATION:
+                fraction = mSat;
+                break;
+            case VALUE:
+                fraction = mVal;
+                break;
+        }
+        return fraction * mRect.width() + mRect.left;
+    }
+
+    private Shader createGradient() {
+        switch (mPickerType) {
+            case HUE:
+                return new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
+                        ColorUtils.getHueRingColors(7, mSat, mVal), null, LinearGradient.TileMode.CLAMP);
+            case SATURATION:
+                return new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
+                        ColorUtils.getColorFromHSV(mHue, 0, mVal), ColorUtils.getColorFromHSV(mHue, 1, mVal), Shader.TileMode.CLAMP);
+            case VALUE:
+                return new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
+                        Color.BLACK, ColorUtils.getColorFromHSV(mHue, mSat, 1), Shader.TileMode.CLAMP);
+        }
+        return null;
+    }
+
     /*
     SETTERS/GETTERS
      */
 
     @Override
     public void setColor(int color) {
-        float fraction = ColorUtils.getFractionFromColor(color);
+        float fraction = 0;
+        switch (mPickerType) {
+            case HUE:
+                fraction = ColorUtils.getFractionFromColor(color);
+                break;
+            case SATURATION:
+                fraction = ColorUtils.getSaturationFromColor(color);
+                break;
+            case VALUE:
+                fraction = ColorUtils.getValueFromColor(color);
+                break;
+        }
         float newX = fraction * mRect.width() + mRect.left;
         animateHandleTo(newX);
     }
+
+    public void setHSV(float hue, float sat, float val) {
+        mHue = hue;
+        mSat = sat;
+        mVal = val;
+
+        mColorPaint.setShader(createGradient());
+        mHandlePaint.setColor(ColorUtils.getColorFromHSV(hue, sat, val));
+        invalidate();
+    }
+
 }
