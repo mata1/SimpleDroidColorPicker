@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 
 import com.github.mata1.simpledroidcolorpicker.R;
+import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorChangedListener;
 import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 
@@ -20,6 +21,8 @@ import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 public class RingColorPicker extends RectHandleColorPicker {
 
     private Paint mInnerPaint;
+
+    private LinearColorPicker mValLCP, mSatLCP;
 
     private int mRingWidth, mGapWidth; // view attributes
     private float mInnerRadius, mOuterRadius; // view measurements
@@ -160,6 +163,12 @@ public class RingColorPicker extends RectHandleColorPicker {
         // fire event
         if (mOnColorChangedListener != null)
             mOnColorChangedListener.colorChanged(color);
+
+        // set linear pickers if attached
+        if (mSatLCP != null)
+            mSatLCP.setHSV(mHue, mSat, mVal);
+        if (mValLCP != null)
+            mValLCP.setHSV(mHue, mSat, mVal);
     }
 
     /**
@@ -232,5 +241,41 @@ public class RingColorPicker extends RectHandleColorPicker {
      */
     public int getGapWidth() {
         return mGapWidth;
+    }
+
+    public void setSaturationLinearColorPicker(LinearColorPicker lcp) {
+        mSatLCP = lcp;
+        if (mSatLCP != null) {
+            mSatLCP.setHSV(mHue, mSat, mVal);
+            mSatLCP.setOnColorChangedListener(new OnColorChangedListener() {
+                @Override
+                public void colorChanged(int color) {
+                    mSat = ColorUtils.getSaturationFromColor(color);
+                    mColorPaint.setShader(new SweepGradient(0, 0, ColorUtils.getHueRingColors(7, mSat, mVal), null));
+                    mHandlePaint.setColor(color);
+                    if (mValLCP != null)
+                        mValLCP.setHSV(mHue, mSat, mVal);
+                    invalidate();
+                }
+            });
+        }
+    }
+
+    public void setValueLinearColorPicker(LinearColorPicker lcp) {
+        mValLCP = lcp;
+        if (mValLCP != null) {
+            mValLCP.setHSV(mHue, mSat, mVal);
+            mValLCP.setOnColorChangedListener(new OnColorChangedListener() {
+                @Override
+                public void colorChanged(int color) {
+                    mVal = ColorUtils.getValueFromColor(color);
+                    mColorPaint.setShader(new SweepGradient(0, 0, ColorUtils.getHueRingColors(7, mSat, mVal), null));
+                    mHandlePaint.setColor(color);
+                    if (mSatLCP != null)
+                        mSatLCP.setHSV(mHue, mSat, mVal);
+                    invalidate();
+                }
+            });
+        }
     }
 }

@@ -124,6 +124,8 @@ public class CircleColorPicker extends CircleHandleColorPicker {
         // fire event
         if (mOnColorChangedListener != null)
             mOnColorChangedListener.colorChanged(color);
+
+        // set value linear picker if attached
         if (mValLCP != null)
             mValLCP.setHSV(mHue, mSat, mVal);
     }
@@ -163,7 +165,7 @@ public class CircleColorPicker extends CircleHandleColorPicker {
         animateHandleTo(x, y);
     }
 
-    public void setLinearColorPicker(LinearColorPicker lcp) {
+    public void setValueLinearColorPicker(LinearColorPicker lcp) {
         mValLCP = lcp;
         if (mValLCP != null) {
             mValLCP.setHSV(mHue, mSat, mVal);

@@ -13,7 +13,7 @@
         custom:value="0.8"
 
         android:id="@+id/ccp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="200dp"
@@ -26,7 +26,7 @@
         custom:value="0.8"
 
         android:id="@+id/rcp"
-        android:visibility="gone"
+        android:visibility="visible"
         android:padding="10dp"
         android:background="#00aaffdd"
         android:layout_width="match_parent"

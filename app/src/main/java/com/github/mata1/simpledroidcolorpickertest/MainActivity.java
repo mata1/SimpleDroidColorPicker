@@ -39,6 +39,8 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
         // ring color picker
         rcp = (RingColorPicker)findViewById(R.id.rcp);
+        rcp.setSaturationLinearColorPicker(lcp_sat);
+        rcp.setValueLinearColorPicker(lcp_val);
         rcp.setOnColorPickedListener(new OnColorPickedListener() {
             @Override
             public void colorPicked(int color) {
@@ -48,7 +50,7 @@ public class MainActivity extends Activity implements SeekBar.OnSeekBarChangeLis
 
         // circle color picker
         ccp = (CircleColorPicker)findViewById(R.id.ccp);
-        ccp.setLinearColorPicker(lcp_val);
+        //ccp.setValueLinearColorPicker(lcp_val);
 
         // seekbars
         sbRing = (SeekBar)findViewById(R.id.sb_ring);
