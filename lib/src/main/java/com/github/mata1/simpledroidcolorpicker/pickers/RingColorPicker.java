@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.SweepGradient;
 import android.util.AttributeSet;
@@ -75,16 +76,23 @@ public class RingColorPicker extends RectHandleColorPicker {
         mOuterRadius = Math.min(mHalfWidth, mHalfHeight) - mColorPaint.getStrokeWidth()/2 - getMaxPadding() - HANDLE_PADDING;
         mInnerRadius = mOuterRadius - mColorPaint.getStrokeWidth()/2 - mGapWidth;
 
+        float s = mHandleStrokePaint.getStrokeWidth() / 2;
         mHandleRect.set(
-                mInnerRadius + mGapWidth - HANDLE_PADDING, // left
+                mInnerRadius + mGapWidth - HANDLE_PADDING + s, // left
                 -HANDLE_WIDTH/2, // top
-                mOuterRadius + mColorPaint.getStrokeWidth()/2f + HANDLE_PADDING, // right
+                mOuterRadius + mColorPaint.getStrokeWidth()/2 + HANDLE_PADDING - s, // right
                 HANDLE_WIDTH/2 // bottom
         );
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (isInEditMode()) {
+            mColorPaint.setShader(new SweepGradient(0, 0, COLORS, null));
+            mInnerPaint.setColor(Color.RED);
+            mHandlePaint.setColor(Color.RED);
+        }
+
         canvas.translate(mHalfWidth, mHalfHeight);
         // outer ring
         canvas.drawCircle(0, 0, mOuterRadius, mColorPaint);

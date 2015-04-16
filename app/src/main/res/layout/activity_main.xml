@@ -3,14 +3,25 @@
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/defaultPadding"
     tools:context=".MainActivity"
     android:orientation="vertical">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+
+        custom:contentInsetEnd="4dp"
+        custom:contentInsetStart="4dp">
+        </android.support.v7.widget.Toolbar>
+
     <com.github.mata1.simpledroidcolorpicker.pickers.CircleColorPicker
         custom:hue="120"
-        custom:saturation="0.5"
-        custom:value="0.8"
+        custom:saturation="1.0"
+        custom:value="1.0"
 
         android:id="@+id/ccp"
         android:visibility="gone"
@@ -22,17 +33,19 @@
 
     <com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker
         custom:hue="120"
-        custom:saturation="0.5"
-        custom:value="0.8"
+        custom:saturation="1.0"
+        custom:value="1.0"
+
+        custom:handleStrokeColor="@color/background_material_dark"
 
         android:id="@+id/rcp"
-        android:visibility="gone"
-        android:padding="10dp"
+        android:visibility="visible"
+        android:padding="0dp"
         android:background="#00aaffdd"
         android:layout_width="match_parent"
         android:layout_gravity="center"
         android:layout_weight="1"
-        android:layout_height="200dp" />
+        android:layout_height="0dp" />
 
     <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
         custom:hue="120"
@@ -40,7 +53,7 @@
         custom:value="0.8"
 
         android:id="@+id/lcp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="60dp" />
@@ -52,7 +65,7 @@
 
         custom:pickerType="saturation"
         android:id="@+id/lcp_sat"
-        android:visibility="visible"
+        android:visibility="gone"
         android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="60dp" />
@@ -60,6 +73,7 @@
     <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
         custom:pickerType="value"
         android:id="@+id/lcp_val"
+        android:visibility="gone"
         android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="60dp" />

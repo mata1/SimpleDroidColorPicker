@@ -83,6 +83,24 @@ public class LinearColorPicker extends RectHandleColorPicker {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (isInEditMode()) {
+            switch (mPickerType) {
+                case HUE:
+                    mColorPaint.setShader(new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
+                            COLORS, null, LinearGradient.TileMode.CLAMP));
+                    break;
+                case SATURATION:
+                    mColorPaint.setShader(new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
+                            Color.WHITE, Color.RED, LinearGradient.TileMode.CLAMP));
+                    break;
+                case VALUE:
+                    mColorPaint.setShader(new LinearGradient(mRect.left, mRect.centerY(), mRect.right, mRect.centerY(),
+                            Color.BLACK, Color.RED, LinearGradient.TileMode.CLAMP));
+                    break;
+            }
+            mHandlePaint.setColor(Color.RED);
+        }
+
         // draw gradient
         canvas.drawRoundRect(mRect, RECT_EDGE_RADIUS, RECT_EDGE_RADIUS, mColorPaint);
 

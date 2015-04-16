@@ -1,9 +1,10 @@
 package com.github.mata1.simpledroidcolorpickertest;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
@@ -19,7 +20,7 @@ import java.io.FileOutputStream;
 import java.util.Random;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends ActionBarActivity {
 
     private RingColorPicker rcp;
     private CircleColorPicker ccp;
@@ -29,6 +30,12 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("SimpleDroidColorPicker");
+        toolbar.setSubtitle("Example");
+        toolbar.setLogo(R.mipmap.ic_launcher);
+        setSupportActionBar(toolbar);
 
         // linear color pickers
         lcp = (LinearColorPicker)findViewById(R.id.lcp);
@@ -43,6 +50,7 @@ public class MainActivity extends Activity {
             @Override
             public void colorPicked(int color) {
                 Toast.makeText(getApplicationContext(), "Color selected: " + color, Toast.LENGTH_SHORT).show();
+                toolbar.setBackgroundColor(color);
             }
         });
 

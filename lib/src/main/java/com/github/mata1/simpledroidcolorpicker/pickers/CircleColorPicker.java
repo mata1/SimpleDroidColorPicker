@@ -4,6 +4,7 @@ import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
@@ -60,6 +61,9 @@ public class CircleColorPicker extends CircleHandleColorPicker {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (isInEditMode())
+            mHandlePaint.setColor(Color.RED);
+
         canvas.translate(mHalfWidth, mHalfHeight);
 
         canvas.drawCircle(0, 0, mRadius, mColorPaint);
