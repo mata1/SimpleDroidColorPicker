@@ -94,7 +94,7 @@
     </LinearLayout>
 
     <com.github.mata1.simpledroidcolorpicker.pickers.linear.HSVLinearColorPicker
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="160dp"/>
 
@@ -110,5 +110,11 @@
         android:text="Save image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />-->
+
+    <Button
+        android:text="DIALOG"
+        android:onClick="showDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

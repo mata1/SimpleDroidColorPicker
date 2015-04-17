@@ -6,7 +6,6 @@ import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.util.AttributeSet;
 
-import com.github.mata1.simpledroidcolorpicker.pickers.ColorPicker;
 import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 
 /**

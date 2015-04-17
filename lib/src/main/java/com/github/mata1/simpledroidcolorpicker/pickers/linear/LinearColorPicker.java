@@ -2,16 +2,13 @@ package com.github.mata1.simpledroidcolorpicker.pickers.linear;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-import com.github.mata1.simpledroidcolorpicker.R;
 import com.github.mata1.simpledroidcolorpicker.pickers.ColorPicker;
 import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 import com.github.mata1.simpledroidcolorpicker.utils.Utils;

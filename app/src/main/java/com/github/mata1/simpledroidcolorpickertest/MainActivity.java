@@ -8,10 +8,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
+import com.github.mata1.simpledroidcolorpicker.dialogs.ColorPickerDialog;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
 import com.github.mata1.simpledroidcolorpicker.pickers.CircleColorPicker;
-import com.github.mata1.simpledroidcolorpicker.pickers.linear.LinearColorPicker;
 import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
+import com.github.mata1.simpledroidcolorpicker.pickers.linear.LinearColorPicker;
 import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 
 import java.io.File;
@@ -76,5 +77,19 @@ public class MainActivity extends ActionBarActivity {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public void showDialog(View v) {
+        final View vv = v;
+
+        ColorPickerDialog dialog = new ColorPickerDialog(this, ColorPickerDialog.PickerType.CIRCLE);
+        dialog.setOnColorPickedListener(new OnColorPickedListener() {
+            @Override
+            public void colorPicked(int color) {
+                vv.setBackgroundColor(color);
+            }
+        });
+
+        dialog.show();
     }
 }
