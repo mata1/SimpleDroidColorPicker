@@ -8,6 +8,7 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
+        android:visibility="gone"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
 
@@ -18,25 +19,27 @@
         custom:contentInsetStart="4dp">
         </android.support.v7.widget.Toolbar>
 
+    <!-- CIRCLE color picker -->
+
     <com.github.mata1.simpledroidcolorpicker.pickers.CircleColorPicker
         custom:hue="120"
         custom:saturation="1.0"
         custom:value="1.0"
 
         android:id="@+id/ccp"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="0dp"
         android:layout_gravity="center"
-        android:padding="10dp" />
+        android:padding="0dp" />
+
+    <!-- RING color picker -->
 
     <com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker
         custom:hue="120"
         custom:saturation="1.0"
         custom:value="1.0"
-
-        custom:handleStrokeColor="@color/background_material_dark"
 
         android:id="@+id/rcp"
         android:visibility="visible"
@@ -47,38 +50,51 @@
         android:layout_weight="1"
         android:layout_height="0dp" />
 
-    <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
-        custom:hue="120"
-        custom:saturation="0.5"
-        custom:value="0.8"
+    <!-- LINEAR color pickers -->
 
-        android:id="@+id/lcp"
+    <LinearLayout
         android:visibility="gone"
-        android:padding="10dp"
         android:layout_width="match_parent"
-        android:layout_height="60dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-    <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
-        custom:hue="120"
-        custom:saturation="0.5"
-        custom:value="0.8"
+        <com.github.mata1.simpledroidcolorpicker.pickers.linear.HueLinearColorPicker
+            custom:hue="120"
+            custom:saturation="0.5"
+            custom:value="0.8"
 
-        custom:pickerType="saturation"
-        android:id="@+id/lcp_sat"
-        android:visibility="gone"
-        android:padding="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="60dp" />
+            android:id="@+id/lcp_hue"
+            android:visibility="visible"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp" />
 
-    <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
-        custom:pickerType="value"
-        android:id="@+id/lcp_val"
-        android:visibility="gone"
-        android:padding="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="60dp" />
+        <com.github.mata1.simpledroidcolorpicker.pickers.linear.SaturationLinearColorPicker
+            custom:hue="120"
+            custom:saturation="0.5"
+            custom:value="0.8"
 
-    <com.github.mata1.simpledroidcolorpicker.pickers.HSVLinearColorPicker
+            android:id="@+id/lcp_sat"
+            android:visibility="visible"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp" />
+
+        <com.github.mata1.simpledroidcolorpicker.pickers.linear.ValueLinearColorPicker
+            android:id="@+id/lcp_val"
+            android:visibility="visible"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp" />
+
+    </LinearLayout>
+
+    <com.github.mata1.simpledroidcolorpicker.pickers.linear.HSVLinearColorPicker
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="160dp"/>
 

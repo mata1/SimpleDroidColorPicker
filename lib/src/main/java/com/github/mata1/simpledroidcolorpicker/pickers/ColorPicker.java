@@ -26,6 +26,8 @@ public abstract class ColorPicker extends View {
     protected Paint mHandlePaint, mHandleStrokePaint;
     private int mHandleStrokeColor;
 
+    protected float mHandleSize, mTouchSize;
+
     protected float mHue, mSat, mVal; // HSV color values
 
     protected float mHalfWidth, mHalfHeight;
@@ -64,6 +66,10 @@ public abstract class ColorPicker extends View {
             mHue = Utils.normalizeAngle(a.getFloat(R.styleable.ColorPicker_hue, 0));
             mSat = Utils.clamp(a.getFloat(R.styleable.ColorPicker_saturation, 1), 0, 1);
             mVal = Utils.clamp(a.getFloat(R.styleable.ColorPicker_value, 1), 0, 1);
+
+            // TODO add to XML attributes
+            mHandleSize = getResources().getDimensionPixelSize(R.dimen.default_handleSize);
+            mTouchSize = getResources().getDimensionPixelSize(R.dimen.default_touchSize);
         } finally {
             a.recycle();
         }
@@ -91,6 +97,9 @@ public abstract class ColorPicker extends View {
     }
 
     protected abstract void handleTouch(int motionAction, float x, float y);
+
+    protected abstract void moveHandleTo(float x, float y);
+    protected abstract void animateHandleTo(float x, float y);
 
     /**
      * Get view maximum padding

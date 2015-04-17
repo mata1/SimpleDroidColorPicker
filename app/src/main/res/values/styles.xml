@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
         <!-- colorPrimary is used for the default action bar background -->
         <item name="colorPrimary">#ff5555</item>

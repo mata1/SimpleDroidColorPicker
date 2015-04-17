@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
+    <com.github.mata1.simpledroidcolorpicker.pickers.linear.HueLinearColorPicker
         style="@style/HSVLinearColorPicker"
-        android:id="@+id/hue"
-        app:pickerType="hue"/>
+        android:id="@+id/hue"/>
 
-    <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
+    <com.github.mata1.simpledroidcolorpicker.pickers.linear.SaturationLinearColorPicker
         style="@style/HSVLinearColorPicker"
-        android:id="@+id/sat"
-        app:pickerType="saturation" />
+        android:id="@+id/sat" />
 
-    <com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker
+    <com.github.mata1.simpledroidcolorpicker.pickers.linear.ValueLinearColorPicker
         style="@style/HSVLinearColorPicker"
-        android:id="@+id/val"
-        app:pickerType="value" />
+        android:id="@+id/val" />
 
 </LinearLayout>

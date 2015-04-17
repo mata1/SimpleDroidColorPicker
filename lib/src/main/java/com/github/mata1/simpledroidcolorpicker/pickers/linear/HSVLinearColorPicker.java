@@ -1,4 +1,4 @@
-package com.github.mata1.simpledroidcolorpicker.pickers;
+package com.github.mata1.simpledroidcolorpicker.pickers.linear;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -16,7 +16,9 @@ public class HSVLinearColorPicker extends LinearLayout {
 
     private OnColorChangedListener mOnColorChangedListener;
 
-    private LinearColorPicker mHueLCP, mSatLCP, mValLCP;
+    private HueLinearColorPicker mHueLCP;
+    private SaturationLinearColorPicker mSatLCP;
+    private ValueLinearColorPicker mValLCP;
 
     private float mHue, mSat, mVal;
 
@@ -37,16 +39,16 @@ public class HSVLinearColorPicker extends LinearLayout {
         mSat = 1;
         mVal = 1;
 
-        mHueLCP = (LinearColorPicker)v.findViewById(R.id.hue);
-        mSatLCP = (LinearColorPicker)v.findViewById(R.id.sat);
-        mValLCP = (LinearColorPicker)v.findViewById(R.id.val);
+        mHueLCP = (HueLinearColorPicker)v.findViewById(R.id.hue);
+        mSatLCP = (SaturationLinearColorPicker)v.findViewById(R.id.sat);
+        mValLCP = (ValueLinearColorPicker)v.findViewById(R.id.val);
 
         mHueLCP.setOnColorChangedListener(new OnColorChangedListener() {
             @Override
             public void colorChanged(int color) {
                 mHue = ColorUtils.getHueFromColor(color);
-                mSatLCP.setHSV(mHue, mSat, mVal);
-                mValLCP.setHSV(mHue, mSat, mVal);
+                mSatLCP.updateHSV(mHue, mSat, mVal);
+                mValLCP.updateHSV(mHue, mSat, mVal);
 
                 if (mOnColorChangedListener != null)
                     mOnColorChangedListener.colorChanged(ColorUtils.getColorFromHSV(mHue, mSat, mVal));
@@ -57,8 +59,8 @@ public class HSVLinearColorPicker extends LinearLayout {
             @Override
             public void colorChanged(int color) {
                 mSat = ColorUtils.getSaturationFromColor(color);
-                mHueLCP.setHSV(mHue, mSat, mVal);
-                mValLCP.setHSV(mHue, mSat, mVal);
+                mHueLCP.updateHSV(mHue, mSat, mVal);
+                mValLCP.updateHSV(mHue, mSat, mVal);
 
                 if (mOnColorChangedListener != null)
                     mOnColorChangedListener.colorChanged(ColorUtils.getColorFromHSV(mHue, mSat, mVal));
@@ -69,8 +71,8 @@ public class HSVLinearColorPicker extends LinearLayout {
             @Override
             public void colorChanged(int color) {
                 mVal = ColorUtils.getValueFromColor(color);
-                mHueLCP.setHSV(mHue, mSat, mVal);
-                mSatLCP.setHSV(mHue, mSat, mVal);
+                mHueLCP.updateHSV(mHue, mSat, mVal);
+                mSatLCP.updateHSV(mHue, mSat, mVal);
 
                 if (mOnColorChangedListener != null)
                     mOnColorChangedListener.colorChanged(ColorUtils.getColorFromHSV(mHue, mSat, mVal));

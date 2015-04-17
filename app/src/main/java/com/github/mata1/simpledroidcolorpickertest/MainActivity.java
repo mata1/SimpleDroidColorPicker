@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
 import com.github.mata1.simpledroidcolorpicker.pickers.CircleColorPicker;
-import com.github.mata1.simpledroidcolorpicker.pickers.LinearColorPicker;
+import com.github.mata1.simpledroidcolorpicker.pickers.linear.LinearColorPicker;
 import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
 import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 
@@ -38,7 +38,7 @@ public class MainActivity extends ActionBarActivity {
         setSupportActionBar(toolbar);
 
         // linear color pickers
-        lcp = (LinearColorPicker)findViewById(R.id.lcp);
+        lcp = (LinearColorPicker)findViewById(R.id.lcp_hue);
         lcp_sat = (LinearColorPicker)findViewById(R.id.lcp_sat);
         lcp_val = (LinearColorPicker)findViewById(R.id.lcp_val);
 

@@ -11,12 +11,4 @@
         <attr name="ringWidth" format="dimension"/>
         <attr name="gapWidth" format="dimension"/>
     </declare-styleable>
-
-    <declare-styleable name="LinearColorPicker">
-        <attr name="pickerType" format="enum">
-            <enum name="hue" value="0"/>
-            <enum name="saturation" value="1"/>
-            <enum name="value" value="2"/>
-        </attr>
-    </declare-styleable>
 </resources>
