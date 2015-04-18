@@ -13,7 +13,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorChangedListener;
-import com.github.mata1.simpledroidcolorpicker.pickers.linear.LinearColorPicker;
+import com.github.mata1.simpledroidcolorpicker.pickers.linear.ValueLinearColorPicker;
 import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 
@@ -27,7 +27,7 @@ public class CircleColorPicker extends ColorPicker {
     private float mHandleX, mHandleY; // handle center
     private float mRadius; // circle radius
 
-    private LinearColorPicker mValLCP;
+    private ValueLinearColorPicker mValLCP;
 
     public CircleColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -114,9 +114,6 @@ public class CircleColorPicker extends ColorPicker {
         setMeasuredDimension(min, min);
     }
 
-    /**
-     * Set handle color based on current position
-     */
     @Override
     protected void moveHandleTo(float x, float y) {
         mHandleX = x;
@@ -138,11 +135,6 @@ public class CircleColorPicker extends ColorPicker {
             mValLCP.updateHSV(mHue, mSat, mVal);
     }
 
-    /**
-     * Animate handle to new position
-     * @param x new x
-     * @param y new y
-     */
     @Override
     protected void animateHandleTo(float x, float y) {
         PropertyValuesHolder xHolder = PropertyValuesHolder.ofFloat("x", mHandleX, x);
@@ -168,10 +160,15 @@ public class CircleColorPicker extends ColorPicker {
         float sat = ColorUtils.getSaturationFromColor(color);
         float x = (float)Math.cos(Math.toRadians(hue)) * sat * mRadius;
         float y = (float)Math.sin(Math.toRadians(hue)) * sat * mRadius;
+
+        // add value
+        mVal = ColorUtils.getValueFromColor(color);
+        mValuePaint.setAlpha((int) ((1 - mVal) * 255));
+
         animateHandleTo(x, y);
     }
 
-    public void setValueLinearColorPicker(LinearColorPicker lcp) {
+    public void setValueLinearColorPicker(ValueLinearColorPicker lcp) {
         mValLCP = lcp;
         if (mValLCP != null) {
             mValLCP.updateHSV(mHue, mSat, mVal);

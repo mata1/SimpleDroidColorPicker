@@ -14,7 +14,8 @@ import android.view.SoundEffectConstants;
 
 import com.github.mata1.simpledroidcolorpicker.R;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorChangedListener;
-import com.github.mata1.simpledroidcolorpicker.pickers.linear.LinearColorPicker;
+import com.github.mata1.simpledroidcolorpicker.pickers.linear.SaturationLinearColorPicker;
+import com.github.mata1.simpledroidcolorpicker.pickers.linear.ValueLinearColorPicker;
 import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 import com.github.mata1.simpledroidcolorpicker.utils.Utils;
 
@@ -27,7 +28,8 @@ public class RingColorPicker extends ColorPicker {
 
     private RectF mHandleRect;
 
-    private LinearColorPicker mValLCP, mSatLCP;
+    private ValueLinearColorPicker mValLCP;
+    private SaturationLinearColorPicker mSatLCP;
 
     private int mRingWidth, mGapWidth; // view attributes
     private float mInnerRadius, mOuterRadius; // view measurements
@@ -193,6 +195,10 @@ public class RingColorPicker extends ColorPicker {
     @Override
     protected void animateHandleTo(float x, float y) {
         float angle = Utils.normalizeAngle(Utils.getAngleDeg(0, 0, x, y));
+        animateHandleTo(angle);
+    }
+
+    private void animateHandleTo(float angle) {
         float diff = mHue - angle;
 
         // correct angles
@@ -216,9 +222,11 @@ public class RingColorPicker extends ColorPicker {
 
     @Override
     public void setColor(int color) {
-        // TODO fix
         float angle = ColorUtils.getHueFromColor(color);
-        animateHandleTo(angle, 0);
+        mSat = ColorUtils.getSaturationFromColor(color);
+        mVal = ColorUtils.getValueFromColor(color);
+        mColorPaint.setShader(new SweepGradient(0, 0, ColorUtils.getHueRingColors(7, mSat, mVal), null));
+        animateHandleTo(angle);
     }
 
     /**
@@ -260,7 +268,7 @@ public class RingColorPicker extends ColorPicker {
         return mGapWidth;
     }
 
-    public void setSaturationLinearColorPicker(LinearColorPicker lcp) {
+    public void setSaturationLinearColorPicker(SaturationLinearColorPicker lcp) {
         mSatLCP = lcp;
         if (mSatLCP != null) {
             mSatLCP.updateHSV(mHue, mSat, mVal);
@@ -270,6 +278,7 @@ public class RingColorPicker extends ColorPicker {
                     mSat = ColorUtils.getSaturationFromColor(color);
                     mColorPaint.setShader(new SweepGradient(0, 0, ColorUtils.getHueRingColors(7, mSat, mVal), null));
                     mHandlePaint.setColor(color);
+                    mInnerPaint.setColor(color);
                     if (mValLCP != null)
                         mValLCP.updateHSV(mHue, mSat, mVal);
                     invalidate();
@@ -278,7 +287,7 @@ public class RingColorPicker extends ColorPicker {
         }
     }
 
-    public void setValueLinearColorPicker(LinearColorPicker lcp) {
+    public void setValueLinearColorPicker(ValueLinearColorPicker lcp) {
         mValLCP = lcp;
         if (mValLCP != null) {
             mValLCP.updateHSV(mHue, mSat, mVal);
@@ -288,6 +297,7 @@ public class RingColorPicker extends ColorPicker {
                     mVal = ColorUtils.getValueFromColor(color);
                     mColorPaint.setShader(new SweepGradient(0, 0, ColorUtils.getHueRingColors(7, mSat, mVal), null));
                     mHandlePaint.setColor(color);
+                    mInnerPaint.setColor(color);
                     if (mSatLCP != null)
                         mSatLCP.updateHSV(mHue, mSat, mVal);
                     invalidate();

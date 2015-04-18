@@ -12,7 +12,9 @@ import com.github.mata1.simpledroidcolorpicker.dialogs.ColorPickerDialog;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
 import com.github.mata1.simpledroidcolorpicker.pickers.CircleColorPicker;
 import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
-import com.github.mata1.simpledroidcolorpicker.pickers.linear.LinearColorPicker;
+import com.github.mata1.simpledroidcolorpicker.pickers.linear.HueLinearColorPicker;
+import com.github.mata1.simpledroidcolorpicker.pickers.linear.SaturationLinearColorPicker;
+import com.github.mata1.simpledroidcolorpicker.pickers.linear.ValueLinearColorPicker;
 import com.github.mata1.simpledroidcolorpicker.utils.ColorUtils;
 
 import java.io.File;
@@ -25,7 +27,9 @@ public class MainActivity extends ActionBarActivity {
 
     private RingColorPicker rcp;
     private CircleColorPicker ccp;
-    private LinearColorPicker lcp, lcp_sat, lcp_val;
+    private HueLinearColorPicker lcpHue;
+    private SaturationLinearColorPicker lcpSat;
+    private ValueLinearColorPicker lcpVal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +43,14 @@ public class MainActivity extends ActionBarActivity {
         setSupportActionBar(toolbar);
 
         // linear color pickers
-        lcp = (LinearColorPicker)findViewById(R.id.lcp_hue);
-        lcp_sat = (LinearColorPicker)findViewById(R.id.lcp_sat);
-        lcp_val = (LinearColorPicker)findViewById(R.id.lcp_val);
+        lcpHue = (HueLinearColorPicker)findViewById(R.id.lcp_hue);
+        lcpSat = (SaturationLinearColorPicker)findViewById(R.id.lcp_sat);
+        lcpVal = (ValueLinearColorPicker)findViewById(R.id.lcp_val);
 
         // ring color picker
         rcp = (RingColorPicker)findViewById(R.id.rcp);
-        rcp.setSaturationLinearColorPicker(lcp_sat);
-        rcp.setValueLinearColorPicker(lcp_val);
+        //rcp.setSaturationLinearColorPicker(lcpSat);
+        //rcp.setValueLinearColorPicker(lcpVal);
         rcp.setOnColorPickedListener(new OnColorPickedListener() {
             @Override
             public void colorPicked(int color) {
@@ -57,15 +61,17 @@ public class MainActivity extends ActionBarActivity {
 
         // circle color picker
         ccp = (CircleColorPicker)findViewById(R.id.ccp);
-        //ccp.setValueLinearColorPicker(lcp_val);
+        //ccp.setValueLinearColorPicker(lcpVal);
     }
 
     public void randomColor(View v) {
         Random r = new Random();
-        int color = ColorUtils.getColorFromHSV(r.nextInt(360), r.nextFloat(), 1);
+        int color = ColorUtils.getColorFromHSV(r.nextFloat() * 360, r.nextFloat(), r.nextFloat());
         rcp.setColor(color);
         ccp.setColor(color);
-        lcp.setColor(color);
+        lcpHue.setColor(color);
+        lcpSat.setColor(color);
+        lcpVal.setColor(color);
     }
 
     public void save(View v) {
@@ -79,14 +85,13 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public void showDialog(View v) {
-        final View vv = v;
+    public void showDialog(final View v) {
 
-        ColorPickerDialog dialog = new ColorPickerDialog(this, ColorPickerDialog.PickerType.CIRCLE);
+        ColorPickerDialog dialog = new ColorPickerDialog(this, ColorPickerDialog.PickerType.HSV);
         dialog.setOnColorPickedListener(new OnColorPickedListener() {
             @Override
             public void colorPicked(int color) {
-                vv.setBackgroundColor(color);
+                v.setBackgroundColor(color);
             }
         });
 

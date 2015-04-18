@@ -33,7 +33,7 @@ public class HSVLinearColorPicker extends LinearLayout {
     }
 
     private void init() {
-        View v = inflate(getContext(), R.layout.hsv_color_picker, null);
+        View v = inflate(getContext(), R.layout.hsv_color_picker, this);
 
         mHue = 0;
         mSat = 1;
@@ -78,8 +78,6 @@ public class HSVLinearColorPicker extends LinearLayout {
                     mOnColorChangedListener.colorChanged(ColorUtils.getColorFromHSV(mHue, mSat, mVal));
             }
         });
-
-        addView(v);
     }
 
     public void setOnColorChangedListener(OnColorChangedListener listener) {
