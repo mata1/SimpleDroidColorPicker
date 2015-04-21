@@ -140,8 +140,10 @@ public class RingColorPicker extends ColorPicker {
 
             case MotionEvent.ACTION_MOVE:
                 // check if dragging AND touching ring
-                if (mDragging && !isTouchingCenter)
+                if (mDragging && !isTouchingCenter) {
+                    attemptClaimDrag();
                     moveHandleTo(x, y);
+                }
                 break;
 
             case MotionEvent.ACTION_UP:
@@ -162,6 +164,7 @@ public class RingColorPicker extends ColorPicker {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int min = Math.min(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
+        min = Math.max(min, 200);
         setMeasuredDimension(min, min);
     }
 

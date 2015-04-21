@@ -90,8 +90,10 @@ public abstract class LinearColorPicker extends ColorPicker {
 
             case MotionEvent.ACTION_MOVE:
                 // check if handle grabbed and inside bounds
-                if (mDragging)
+                if (mDragging) {
+                    attemptClaimDrag();
                     moveHandleTo(x, 0);
+                }
                 break;
 
             case MotionEvent.ACTION_UP:

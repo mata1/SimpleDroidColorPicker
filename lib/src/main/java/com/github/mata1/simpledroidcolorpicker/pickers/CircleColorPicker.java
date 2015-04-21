@@ -91,6 +91,7 @@ public class CircleColorPicker extends ColorPicker {
 
             case MotionEvent.ACTION_MOVE:
                 if (mDragging) {
+                    attemptClaimDrag();
                     // clamp to circle edge
                     double angle = Utils.getAngle(0, 0, x, y);
                     x = (float)Math.cos(angle) * Math.min(centerDist, mRadius);
@@ -111,6 +112,7 @@ public class CircleColorPicker extends ColorPicker {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int min = Math.min(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
+        min = Math.max(min, 200);
         setMeasuredDimension(min, min);
     }
 

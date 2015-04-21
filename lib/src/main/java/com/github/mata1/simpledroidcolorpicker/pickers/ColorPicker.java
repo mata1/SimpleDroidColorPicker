@@ -102,6 +102,16 @@ public abstract class ColorPicker extends View {
     protected abstract void animateHandleTo(float x, float y);
 
     /**
+     * Tries to claim the user's drag motion, and requests disallowing any
+     * ancestors from stealing events in the drag.
+     */
+    protected void attemptClaimDrag() {
+        if (getParent() != null) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+        }
+    }
+
+    /**
      * Get view maximum padding
      * @return maximum padding
      */
