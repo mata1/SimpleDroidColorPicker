@@ -41,6 +41,10 @@ public class CircleColorPicker extends ColorPicker {
     protected void init() {
         super.init();
 
+        // make circle area equal to square
+        mHandleSize = (float)Math.sqrt(Math.pow(mHandleSize, 2) / Math.PI);
+        mTouchSize = (float)Math.sqrt(Math.pow(mTouchSize, 2) / Math.PI);
+
         mColorPaint.setShader(new SweepGradient(0, 0, COLORS, null));
         mSaturationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mValuePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -53,7 +57,7 @@ public class CircleColorPicker extends ColorPicker {
     @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
         super.onSizeChanged(w, h, oldW, oldH);
-        mRadius = Math.min(mHalfWidth, mHalfHeight) - getMaxPadding() - mHandleSize/2 - mHandleStrokePaint.getStrokeWidth()/2;
+        mRadius = Math.min(mHalfWidth, mHalfHeight) - getMaxPadding() - mHandleSize - mHandleStrokePaint.getStrokeWidth()/2;
 
         // position circle based on HSV values
         mHandleX = (float)Math.cos(Math.toRadians(mHue)) * mSat * mRadius;
@@ -72,8 +76,8 @@ public class CircleColorPicker extends ColorPicker {
         canvas.drawCircle(0, 0, mRadius, mSaturationPaint);
         canvas.drawCircle(0, 0, mRadius + 1, mValuePaint);
 
-        canvas.drawCircle(mHandleX, mHandleY, mHandleSize/2, mHandlePaint);
-        canvas.drawCircle(mHandleX, mHandleY, mHandleSize/2, mHandleStrokePaint);
+        canvas.drawCircle(mHandleX, mHandleY, mHandleSize, mHandlePaint);
+        canvas.drawCircle(mHandleX, mHandleY, mHandleSize, mHandleStrokePaint);
     }
 
     @Override
@@ -86,7 +90,7 @@ public class CircleColorPicker extends ColorPicker {
 
         switch (motionAction) {
             case MotionEvent.ACTION_DOWN:
-                mDragging = Utils.getDistance(x, y, mHandleX, mHandleY) < mTouchSize/2;
+                mDragging = Utils.getDistance(x, y, mHandleX, mHandleY) < mTouchSize;
                 break;
 
             case MotionEvent.ACTION_MOVE:
