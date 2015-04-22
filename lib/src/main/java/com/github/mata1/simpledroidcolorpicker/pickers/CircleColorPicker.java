@@ -168,6 +168,10 @@ public class CircleColorPicker extends ColorPicker {
         mValuePaint.setAlpha((int) ((1 - mVal) * 255));
 
         animateHandleTo(x, y);
+
+        // set value linear picker color
+        if (mValLCP != null)
+            mValLCP.setColor(color);
     }
 
     public void setValueLinearColorPicker(ValueLinearColorPicker lcp) {

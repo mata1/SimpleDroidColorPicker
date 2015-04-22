@@ -51,7 +51,7 @@ public class HSVLinearColorPicker extends LinearLayout {
                 mValLCP.updateHSV(mHue, mSat, mVal);
 
                 if (mOnColorChangedListener != null)
-                    mOnColorChangedListener.colorChanged(ColorUtils.getColorFromHSV(mHue, mSat, mVal));
+                    mOnColorChangedListener.colorChanged(getColor());
             }
         });
 
@@ -63,7 +63,7 @@ public class HSVLinearColorPicker extends LinearLayout {
                 mValLCP.updateHSV(mHue, mSat, mVal);
 
                 if (mOnColorChangedListener != null)
-                    mOnColorChangedListener.colorChanged(ColorUtils.getColorFromHSV(mHue, mSat, mVal));
+                    mOnColorChangedListener.colorChanged(getColor());
             }
         });
 
@@ -75,12 +75,22 @@ public class HSVLinearColorPicker extends LinearLayout {
                 mSatLCP.updateHSV(mHue, mSat, mVal);
 
                 if (mOnColorChangedListener != null)
-                    mOnColorChangedListener.colorChanged(ColorUtils.getColorFromHSV(mHue, mSat, mVal));
+                    mOnColorChangedListener.colorChanged(getColor());
             }
         });
     }
 
     public void setOnColorChangedListener(OnColorChangedListener listener) {
         mOnColorChangedListener = listener;
+    }
+
+    public void setColor(int color) {
+        mHueLCP.setColor(color);
+        mSatLCP.setColor(color);
+        mValLCP.setColor(color);
+    }
+
+    public int getColor() {
+        return ColorUtils.getColorFromHSV(mHue, mSat, mVal);
     }
 }

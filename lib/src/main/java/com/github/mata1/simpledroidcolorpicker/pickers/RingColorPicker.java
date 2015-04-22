@@ -230,6 +230,12 @@ public class RingColorPicker extends ColorPicker {
         mVal = ColorUtils.getValueFromColor(color);
         mColorPaint.setShader(new SweepGradient(0, 0, ColorUtils.getHueRingColors(7, mSat, mVal), null));
         animateHandleTo(angle);
+
+        // set linear picker colors
+        if (mSatLCP != null)
+            mSatLCP.setColor(color);
+        if (mValLCP != null)
+            mValLCP.setColor(color);
     }
 
     /**
