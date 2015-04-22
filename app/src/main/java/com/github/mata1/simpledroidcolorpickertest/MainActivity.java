@@ -12,6 +12,7 @@ import com.github.mata1.simpledroidcolorpicker.dialogs.ColorPickerDialog;
 import com.github.mata1.simpledroidcolorpicker.interfaces.OnColorPickedListener;
 import com.github.mata1.simpledroidcolorpicker.pickers.CircleColorPicker;
 import com.github.mata1.simpledroidcolorpicker.pickers.RingColorPicker;
+import com.github.mata1.simpledroidcolorpicker.pickers.linear.HSVLinearColorPicker;
 import com.github.mata1.simpledroidcolorpicker.pickers.linear.HueLinearColorPicker;
 import com.github.mata1.simpledroidcolorpicker.pickers.linear.SaturationLinearColorPicker;
 import com.github.mata1.simpledroidcolorpicker.pickers.linear.ValueLinearColorPicker;
@@ -31,6 +32,8 @@ public class MainActivity extends ActionBarActivity {
     private SaturationLinearColorPicker lcpSat;
     private ValueLinearColorPicker lcpVal;
 
+    private HSVLinearColorPicker lcpHSV;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +49,8 @@ public class MainActivity extends ActionBarActivity {
         lcpHue = (HueLinearColorPicker)findViewById(R.id.lcp_hue);
         lcpSat = (SaturationLinearColorPicker)findViewById(R.id.lcp_sat);
         lcpVal = (ValueLinearColorPicker)findViewById(R.id.lcp_val);
+
+        lcpHSV = (HSVLinearColorPicker)findViewById(R.id.lcp_hsv);
 
         // ring color picker
         rcp = (RingColorPicker)findViewById(R.id.rcp);
@@ -72,6 +77,7 @@ public class MainActivity extends ActionBarActivity {
         lcpHue.setColor(color);
         lcpSat.setColor(color);
         lcpVal.setColor(color);
+        //lcpHSV.setColor(color);
     }
 
     public void save(View v) {
